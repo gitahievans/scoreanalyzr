@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -19,33 +18,45 @@ export default function Home() {
     const file = event.target.files?.[0];
 
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPdfUrl(url);
+      // Convert blob URL to data URL
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const dataUrl = reader.result as string;
+        setPdfUrl(dataUrl);
 
-      try {
-        const analysis = await analyzeScore({ pdfUrl: url });
-        setAnalysisResult(analysis);
+        try {
+          const analysis = await analyzeScore({ pdfUrl: dataUrl });
+          setAnalysisResult(analysis);
 
-        const musicalElements = `
-          Time Signature: ${analysis.timeSignature}
-          Key Signature: ${analysis.keySignature}
-          Tempo Markings: ${analysis.tempoMarkings}
-          Dynamics: ${analysis.dynamics}
-          Musical Instructions: ${analysis.musicalInstructions}
-          Overall Structure: ${analysis.overallStructure}
-          Harmonic Content: ${analysis.harmonicContent}
-          Notable Features: ${analysis.notableFeatures}
-        `;
+          const musicalElements = `
+            Time Signature: ${analysis.timeSignature}
+            Key Signature: ${analysis.keySignature}
+            Tempo Markings: ${analysis.tempoMarkings}
+            Dynamics: ${analysis.dynamics}
+            Musical Instructions: ${analysis.musicalInstructions}
+            Overall Structure: ${analysis.overallStructure}
+            Harmonic Content: ${analysis.harmonicContent}
+            Notable Features: ${analysis.notableFeatures}
+          `;
 
-        const summaryResult = await generateSummary({ musicalElements });
-        setSummary(summaryResult.summary);
+          const summaryResult = await generateSummary({ musicalElements });
+          setSummary(summaryResult.summary);
 
-      } catch (error) {
-        console.error("Error analyzing score:", error);
-        alert("Failed to analyze score. Please try again.");
-      } finally {
+        } catch (error) {
+          console.error("Error analyzing score:", error);
+          alert("Failed to analyze score. Please try again.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      reader.onerror = () => {
+        console.error("Error reading file.");
+        alert("Failed to read file. Please try again.");
         setIsLoading(false);
-      }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setIsLoading(false); // Ensure loading is set to false if no file is selected
     }
   };
 
