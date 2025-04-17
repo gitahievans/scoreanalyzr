@@ -1,4 +1,4 @@
-// 'use server';
+'use server';
 /**
  * @fileOverview Analyzes a music score to extract musical elements.
  *
@@ -63,7 +63,7 @@ const prompt = ai.definePrompt({
 - Harmonic Content: Summarize the harmonic content of the piece, including chord progressions and key changes.
 - Notable Features: Highlight any notable or unique features of the piece.
 
-Music Score PDF: {{media url=pdfUrl}}
+Music Score PDF: {{media url=pdfUrl contentType="application/pdf"}}
 `,
 });
 
@@ -79,3 +79,6 @@ const analyzeScoreFlow = ai.defineFlow<
   return output!;
 });
 
+
+
+    
