@@ -1,59 +1,118 @@
-'use server';
-
+"use server";
 /**
- * @fileOverview Generates a summary of a music piece based on its extracted musical elements.
+ * @fileOverview Generates a summary of a music piece based on structured analysis results from backend.
  *
- * - generateSummary - A function that generates the summary of the music piece.
- * - GenerateSummaryInput - The input type for the generateSummary function.
- * - GenerateSummaryOutput - The return type for the generateSummary function.
+ * - generateSummaryFromResults - A function that generates the summary from backend analysis results.
+ * - GenerateSummaryFromResultsInput - The input type for the generateSummaryFromResults function.
+ * - GenerateSummaryFromResultsOutput - The return type for the generateSummaryFromResults function.
  */
+import { ai } from "@/ai/ai-instance";
+import { z } from "genkit";
 
-import {ai} from '@/ai/ai-instance';
-import {z} from 'genkit';
-
-const GenerateSummaryInputSchema = z.object({
-  musicalElements: z.string().describe('The extracted musical elements from the music score.'),
+// Define the structure that matches your backend response
+const AnalysisResultsSchema = z.object({
+  key: z.string().describe("The key signature of the piece"),
+  parts: z.array(z.string()).describe("The instrumental parts in the piece"),
+  tempo: z.string().describe("The tempo marking or indication"),
+  time_signature: z.string().describe("The time signature of the piece"),
+  chords: z
+    .array(
+      z.object({
+        pitch: z.string().describe("The chord or pitch identification"),
+        offset: z.number().describe("The timing offset of the chord"),
+      })
+    )
+    .describe("Array of chord progressions with their timing"),
+  lyrics: z.array(z.string()).describe("Lyrics found in the piece"),
+  composer: z.string().describe("The composer of the piece"),
+  title: z.string().describe("The title of the piece"),
+  date: z.string().describe("The date or period of the piece"),
 });
-export type GenerateSummaryInput = z.infer<typeof GenerateSummaryInputSchema>;
 
-const GenerateSummaryOutputSchema = z.object({
-  summary: z.string().describe('The summary of the music piece, including its overall structure, harmonic content, and notable features.'),
+const GenerateSummaryFromResultsInputSchema = z.object({
+  analysisResults: AnalysisResultsSchema.describe(
+    "The structured analysis results from the backend"
+  ),
+  scoreTitle: z.string().optional().describe("The title of the score file"),
 });
-export type GenerateSummaryOutput = z.infer<typeof GenerateSummaryOutputSchema>;
 
-export async function generateSummary(input: GenerateSummaryInput): Promise<GenerateSummaryOutput> {
-  return generateSummaryFlow(input);
+export type GenerateSummaryFromResultsInput = z.infer<
+  typeof GenerateSummaryFromResultsInputSchema
+>;
+
+const GenerateSummaryFromResultsOutputSchema = z.object({
+  summary: z.string().describe("A comprehensive musical summary of the piece"),
+  musicalCharacteristics: z
+    .string()
+    .describe("Key musical characteristics and style"),
+  harmonicAnalysis: z
+    .string()
+    .describe("Analysis of the harmonic content and progressions"),
+  structuralInsights: z
+    .string()
+    .describe("Insights about the musical structure and form"),
+  performanceNotes: z
+    .string()
+    .describe("Notes about performance considerations and difficulty"),
+});
+
+export type GenerateSummaryFromResultsOutput = z.infer<
+  typeof GenerateSummaryFromResultsOutputSchema
+>;
+
+export async function generateSummaryFromResults(
+  input: GenerateSummaryFromResultsInput
+): Promise<GenerateSummaryFromResultsOutput> {
+  return generateSummaryFromResultsFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'generateSummaryPrompt',
+  name: "generateSummaryFromResultsPrompt",
   input: {
-    schema: z.object({
-      musicalElements: z.string().describe('The extracted musical elements from the music score.'),
-    }),
+    schema: GenerateSummaryFromResultsInputSchema,
   },
   output: {
-    schema: z.object({
-      summary: z.string().describe('The summary of the music piece, including its overall structure, harmonic content, and notable features.'),
-    }),
+    schema: GenerateSummaryFromResultsOutputSchema,
   },
-  prompt: `You are a music expert. Generate a summary of the music piece based on the following musical elements:
+  prompt: `You are an expert music analyst and educator. Based on the following structured analysis results, generate a comprehensive and insightful summary of this musical piece.
 
-{{{musicalElements}}}
+Analysis Data:
+- Title: {{scoreTitle}}
+- Key: {{analysisResults.key}}
+- Time Signature: {{analysisResults.time_signature}}
+- Tempo: {{analysisResults.tempo}}
+- Composer: {{analysisResults.composer}}
+- Date: {{analysisResults.date}}
+- Parts/Instruments: {{analysisResults.parts}}
+- Lyrics: {{analysisResults.lyrics}}
+- Chord Progressions: {{analysisResults.chords}}
 
-The summary should include the overall structure, harmonic content, and notable features of the piece.`, 
+Please provide:
+
+1. **Summary**: A comprehensive overview that would help someone understand what this piece is about, its musical style, and its significance.
+
+2. **Musical Characteristics**: Describe the key musical elements that define this piece's character and style.
+
+3. **Harmonic Analysis**: Analyze the chord progressions and harmonic content. Identify patterns, key relationships, and harmonic techniques used.
+
+4. **Structural Insights**: Comment on the musical form, structure, and any notable compositional techniques.
+
+5. **Performance Notes**: Provide insights about performance considerations, difficulty level, and what musicians should be aware of when playing this piece.
+
+Focus on being educational and insightful, avoiding overly technical jargon while still providing meaningful musical analysis.`,
 });
 
-const generateSummaryFlow = ai.defineFlow<
-  typeof GenerateSummaryInputSchema,
-  typeof GenerateSummaryOutputSchema
->({
-  name: 'generateSummaryFlow',
-  inputSchema: GenerateSummaryInputSchema,
-  outputSchema: GenerateSummaryOutputSchema,
-},
-async input => {
-  const {output} = await prompt(input);
-  return output!;
-});
-
+const generateSummaryFromResultsFlow = ai.defineFlow<
+  typeof GenerateSummaryFromResultsInputSchema,
+  typeof GenerateSummaryFromResultsOutputSchema
+>(
+  {
+    name: "generateSummaryFromResultsFlow",
+    inputSchema: GenerateSummaryFromResultsInputSchema,
+    outputSchema: GenerateSummaryFromResultsOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    return output!;
+  }
+);

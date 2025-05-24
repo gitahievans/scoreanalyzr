@@ -41,17 +41,9 @@ export default function Home() {
           }`}
         >
           <ScoreDataProvider scoreId={scoreId} taskId={taskId}>
-            <AnalysisDisplay
-              scoreId={scoreId} // This prop might become redundant if AnalysisDisplay solely relies on the context
-              taskId={taskId}   // This prop might become redundant
-              onProcessingChange={setIsProcessing}
-            />
+            <AnalysisDisplay onProcessingChange={setIsProcessing} />
           </ScoreDataProvider>
         </section>
-
-        {/* <section>
-          <AnalysisHistory />
-        </section> */}
       </div>
     </div>
   );
