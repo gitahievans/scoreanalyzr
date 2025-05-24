@@ -116,7 +116,7 @@ export default function PDFUploader() {
       setFiles([]);
       router.push("/library");
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       notifications.show({
         title: "Error",
         message: error.message,
