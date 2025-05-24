@@ -126,7 +126,7 @@ export default function AnalysisDisplay({
       data && data?.task_status?.state === "PENDING" && !data?.score?.processed
         ? 3000
         : false,
-    retry: (failureCount, error) => {
+    retry: (failureCount: number) => {
       if (failureCount >= 3) return false;
       if (
         data?.task_status?.state === "SUCCESS" ||
@@ -308,7 +308,7 @@ export default function AnalysisDisplay({
                     <div>
                       <strong>Chords:</strong>
                       <ul className="list-disc pl-5">
-                        {data?.score?.results?.chords?.map((chord, index) => (
+                        {data?.score?.results?.chords?.map((chord: any, index: number) => (
                           <li key={index}>
                             {chord.pitch} at offset {chord.offset}
                           </li>
