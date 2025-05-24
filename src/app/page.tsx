@@ -4,6 +4,7 @@ import { useState } from "react";
 import UploadArea from "@/components/UploadArea";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
 import AnalysisHistory from "@/components/AnalysisHistory";
+import { ScoreDataProvider } from "@/contexts/ScoreDataContext"; // Import ScoreDataProvider
 
 export default function Home() {
   const [scoreId, setScoreId] = useState<number | null>(null);
@@ -39,11 +40,13 @@ export default function Home() {
             isProcessing ? "border-2 border-dashed" : ""
           }`}
         >
-          <AnalysisDisplay
-            scoreId={scoreId}
-            taskId={taskId}
-            onProcessingChange={setIsProcessing}
-          />
+          <ScoreDataProvider scoreId={scoreId} taskId={taskId}>
+            <AnalysisDisplay
+              scoreId={scoreId} // This prop might become redundant if AnalysisDisplay solely relies on the context
+              taskId={taskId}   // This prop might become redundant
+              onProcessingChange={setIsProcessing}
+            />
+          </ScoreDataProvider>
         </section>
 
         {/* <section>
