@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 text-foreground">
+    <div className="min-h-screen bg-orange-50 text-foreground font-main">
       <div className="container mx-auto flex flex-col">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-primary">Score Insights</h1>

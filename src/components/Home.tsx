@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
@@ -20,6 +20,7 @@ export interface FileType {
   composer: string;
   categories: Category[];
   year: string;
+  processed: boolean;
 }
 const Home = () => {
   const [files, setFiles] = useState<FileType[]>([]);
@@ -38,8 +39,17 @@ const Home = () => {
           throw new Error("Failed to fetch files");
         }
         const data = await response.json();
-        setFiles(data);
-        setFilteredFiles(data);
+        // filter out files with processes property set to true, and composer is "Anonymous"
+        setFiles(
+          data.filter((file: FileType) => {
+            return !file.processed && file.composer !== "Anonymous";
+          })
+        );
+        setFilteredFiles(
+          data.filter((file: FileType) => {
+            return !file.processed && file.composer !== "Anonymous";
+          })
+        );
         setLoading(false);
       } catch (error: any) {
         console.error("Error fetching PDFs:", error);
@@ -63,6 +73,8 @@ const Home = () => {
     );
     setFilteredFiles(filtered);
   };
+
+  console.log("filteredFiles", filteredFiles);
 
   const handleSort = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortValue = event.target.value;

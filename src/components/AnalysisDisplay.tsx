@@ -136,15 +136,6 @@ export default function AnalysisDisplay({
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                        <div className="text-sm font-medium text-purple-600 mb-1">
-                          Tempo
-                        </div>
-                        <div className="text-lg font-bold text-purple-900">
-                          {data.score.results.tempo}
-                        </div>
-                      </div>
-
                       <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200">
                         <div className="text-sm font-medium text-amber-600 mb-1">
                           Parts
@@ -159,7 +150,7 @@ export default function AnalysisDisplay({
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-semibold text-gray-800">
-                          Chord Progression
+                          A few chords detected
                         </h3>
                         <span className="text-sm text-gray-500">
                           ({data.score.results.chords?.length || 0} chords
@@ -196,47 +187,6 @@ export default function AnalysisDisplay({
                           No chord progression detected
                         </div>
                       )}
-                    </div>
-
-                    {/* Lyrics Section */}
-                    {data.score.results.lyrics &&
-                      data.score.results.lyrics.length > 0 &&
-                      data.score.results.lyrics[0] !== "No lyrics found" && (
-                        <div className="space-y-3">
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            Lyrics
-                          </h3>
-                          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                            <div className="text-green-800 leading-relaxed">
-                              {data.score.results.lyrics.join(" • ")}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Additional Information */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                      <div>
-                        <div className="text-sm font-medium text-gray-600 mb-2">
-                          Composer
-                        </div>
-                        <div className="text-gray-800">
-                          {data.score.results.composer !== "No composer found"
-                            ? data.score.results.composer
-                            : "Unknown"}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-sm font-medium text-gray-600 mb-2">
-                          Date
-                        </div>
-                        <div className="text-gray-800">
-                          {data.score.results.date !== "No date found"
-                            ? data.score.results.date
-                            : "Unknown"}
-                        </div>
-                      </div>
                     </div>
                   </div>
                 ) : (

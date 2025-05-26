@@ -187,7 +187,9 @@ export default function PDFUploader() {
         <h1 className="text-2xl font-bold text-orange-600 mb-2">
           Upload New Music Score
         </h1>
-        <h4 className="text-gray-600">Add a new score to the library</h4>
+        <h4 className="text-gray-600">
+          Share your musical masterpiece with the world!
+        </h4>
       </div>
       <form
         onSubmit={(e) => {

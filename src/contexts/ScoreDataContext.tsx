@@ -3,34 +3,129 @@
 import React, { createContext, useContext } from "react";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 
-// Moved from src/components/AnalysisDisplay.tsx
+// Updated interface to match your new backend response structure
+interface Chord {
+  pitch: string;
+  offset: number;
+}
+
+interface Dynamics {
+  values: string[];
+  has_dynamics: boolean;
+}
+
+interface Accidentals {
+  flats: number;
+  others: number;
+  sharps: number;
+  naturals: number;
+  has_accidentals: boolean;
+}
+
+interface Articulation {
+  count: number;
+  has_accent?: boolean;
+  has_tenuto?: boolean;
+  has_staccato?: boolean;
+}
+
+interface Articulations {
+  accent: Articulation;
+  tenuto: Articulation;
+  staccato: Articulation;
+}
+
+interface ChartDataset {
+  data: number[];
+  label: string;
+  backgroundColor: string[];
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
+interface ChartOptions {
+  scales: {
+    x: {
+      title: {
+        text: string;
+        display: boolean;
+      };
+    };
+    y: {
+      title: {
+        text: string;
+        display: boolean;
+      };
+      beginAtZero: boolean;
+    };
+  };
+  plugins: {
+    title: {
+      text: string;
+      display: boolean;
+    };
+  };
+}
+
+interface NotableElementsChart {
+  data: ChartData;
+  type: string;
+  options: ChartOptions;
+}
+
+interface Visualizations {
+  notable_elements_chart: NotableElementsChart;
+}
+
+interface NotableElements {
+  dynamics: Dynamics;
+  accidentals: Accidentals;
+  articulations: Articulations;
+  visualizations: Visualizations;
+}
+
+interface ScoreStructure {
+  parts: string[];
+  music_type: string;
+  score_type: string;
+  instruments: string[];
+  ensemble_type: string;
+}
+
 interface ScoreResults {
   key: string;
   parts: string[];
-  chords: { pitch: string; offset: number }[];
-  tempo: string;
+  chords: Chord[];
   time_signature: string;
-  composer: string;
-  title: string;
-  date: string;
-  lyrics: string[];
+  score_structure: ScoreStructure;
+  notable_elements: NotableElements;
 }
 
-// Moved from src/components/AnalysisDisplay.tsx
+interface Score {
+  id: number;
+  title: string;
+  lyrics: string[] | null;
+  pdf_file: string | null;
+  composer: string;
+  year: number | undefined;
+  categories: string[];
+  results: ScoreResults | null;
+  processed: boolean;
+  musicxml_url: string | null;
+  midi_url: string | null;
+}
+
+interface TaskStatus {
+  state: string;
+  info: string | null;
+}
+
 interface ScoreResponse {
-  score: {
-    id: number;
-    title: string;
-    composer: string;
-    results: ScoreResults | null;
-    processed: boolean;
-    musicxml_url: string | null;
-    midi_url: string | null;
-  };
-  task_status: {
-    state: string;
-    info: string | null;
-  } | null;
+  score: Score;
+  task_status: TaskStatus;
 }
 
 interface ScoreDataContextState {
@@ -44,11 +139,9 @@ export const ScoreDataContext = createContext<
   ScoreDataContextState | undefined
 >(undefined);
 
-// Moved from src/components/AnalysisDisplay.tsx
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 console.log("API_URL_FROM_CONTEXT:", API_URL);
 
-// Moved from src/components/AnalysisDisplay.tsx
 export const fetchScore = async (
   id: number,
   taskId: string
@@ -91,7 +184,6 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
     },
     retry: (failureCount, errorInstance) => {
       if (failureCount >= 3) return false;
-
       return true;
     },
   });
@@ -105,8 +197,16 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
   );
 };
 
-// Export ScoreDataContext, ScoreDataContextState, ScoreResponse, and ScoreDataProvider
-export type { ScoreDataContextState, ScoreResponse, ScoreResults };
+export type {
+  ScoreDataContextState,
+  ScoreResponse,
+  ScoreResults,
+  Score,
+  TaskStatus,
+  ScoreStructure,
+  NotableElements,
+  Chord,
+};
 
 export const useScoreData = () => {
   const context = useContext(ScoreDataContext);
