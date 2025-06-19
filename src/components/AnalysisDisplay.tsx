@@ -8,13 +8,16 @@ import {
   IconRefresh,
   IconSparkles,
   IconBrain,
+  IconFileMusic,
 } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
-import { useScoreSummary } from "@/hooks/useScoreSummary"; // Import the new hook
+import { useScoreSummary } from "@/hooks/useScoreSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import OSMDComponent from "./OSMDComponent";
+import { log } from "console";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
@@ -34,6 +37,17 @@ export default function AnalysisDisplay({
     canGenerate,
   } = useScoreSummary();
 
+  // OSMD-related state
+  const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
+  const [musicXmlError, setMusicXmlError] = useState<string | null>(null);
+  const [renderOptions] = useState({
+    drawTitle: true,
+    drawComposer: true,
+    drawFingerings: false,
+  });
+  const [musicXmlContent, setMusicXmlContent] = useState<string | null>(null);
+  const [fetchAttempts, setFetchAttempts] = useState(0);
+
   console.log("ScoreData from context:", data);
 
   useEffect(() => {
@@ -43,6 +57,113 @@ export default function AnalysisDisplay({
       onProcessingChange(true);
     }
   }, [data, isLoading, onProcessingChange]);
+
+  useEffect(() => {
+    if (data?.score?.processed && data?.task_status?.state !== "PENDING") {
+      const fetchMusicXml = async () => {
+        try {
+          console.log(
+            "Attempting to fetch MusicXML from:",
+            `${API_URL}${data?.score?.musicxml_url}`
+          );
+
+          const response = await fetch(
+            `${API_URL}${data?.score?.musicxml_url}`,
+            {
+              method: "GET",
+              headers: {
+                Accept:
+                  "application/xml, text/xml, application/vnd.recordare.musicxml+xml, */*",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP error! status: ${response.status} - ${response.statusText}`
+            );
+          }
+
+          // Check content type
+          const contentType = response.headers.get("content-type");
+          console.log("Response content type:", contentType);
+
+          // Get the response as text first to inspect it
+          const textContent = await response.text();
+          console.log("Response length:", textContent.length);
+          console.log("First 200 characters:", textContent.substring(0, 200));
+
+          // Validate that it's actually XML
+          if (
+            !textContent.trim().startsWith("<?xml") &&
+            !textContent.trim().startsWith("<")
+          ) {
+            throw new Error("Response is not valid XML format");
+          }
+
+          // Additional validation for MusicXML
+          if (
+            !textContent.includes("score-partwise") &&
+            !textContent.includes("score-timewise")
+          ) {
+            console.warn(
+              "Warning: Content doesn't appear to be MusicXML format"
+            );
+          }
+
+          setMusicXmlContent(textContent);
+          setMusicXmlError(null);
+          setFetchAttempts(0);
+          console.log("MusicXML fetched successfully");
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Unknown error";
+          console.error("Failed to fetch MusicXML:", errorMessage);
+
+          // Retry logic for transient failures
+          if (
+            fetchAttempts < 3 &&
+            (errorMessage.includes("network") ||
+              errorMessage.includes("timeout"))
+          ) {
+            console.log(`Retrying fetch attempt ${fetchAttempts + 1}/3`);
+            setFetchAttempts((prev) => prev + 1);
+            setTimeout(() => {
+              // Retry after a delay
+            }, 2000 * (fetchAttempts + 1));
+            return;
+          }
+
+          setMusicXmlError(`Failed to fetch MusicXML: ${errorMessage}`);
+          setMusicXmlContent(null);
+          setFetchAttempts(0);
+        }
+      };
+
+      fetchMusicXml();
+    }
+  }, [data?.score?.processed, data?.task_status?.state, fetchAttempts]);
+
+  // OSMD event handlers
+  const handleMusicLoad = () => {
+    console.log("MusicXML loaded successfully in OSMD");
+    setMusicXmlLoaded(true);
+    setMusicXmlError(null);
+  };
+
+  const handleMusicError = (error: string) => {
+    console.error("OSMD Error:", error);
+    setMusicXmlError(error);
+    setMusicXmlLoaded(false);
+  };
+
+  // Manual retry function
+  const retryFetch = () => {
+    setFetchAttempts(0);
+    setMusicXmlError(null);
+    setMusicXmlContent(null);
+    refetch();
+  };
 
   if (error) {
     return (
@@ -57,7 +178,7 @@ export default function AnalysisDisplay({
           <CardContent>
             <p>{error.message}</p>
             <Button className="mt-4" onClick={() => refetch()}>
-              <IconRefresh className="mr-2 h-4 w-4" /> Retry
+              Retry
             </Button>
           </CardContent>
         </Card>
@@ -103,8 +224,9 @@ export default function AnalysisDisplay({
         </Card>
       ) : (
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="results">Analysis Results</TabsTrigger>
+            <TabsTrigger value="musicxml">Sheet Music</TabsTrigger>
             <TabsTrigger value="summary">AI Summary</TabsTrigger>
           </TabsList>
 
@@ -144,6 +266,19 @@ export default function AnalysisDisplay({
                           {data.score.results.parts?.join(", ")}
                         </div>
                       </div>
+
+                      {/* Add MusicXML availability indicator */}
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                        <div className="text-sm font-medium text-purple-600 mb-1">
+                          MusicXML
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <IconFileMusic className="h-4 w-4 text-purple-700" />
+                          <span className="text-sm font-semibold text-purple-900">
+                            {musicXmlContent ? "Available" : "Not Available"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Chord Progression Section */}
@@ -152,10 +287,6 @@ export default function AnalysisDisplay({
                         <h3 className="text-lg font-semibold text-gray-800">
                           A few chords detected
                         </h3>
-                        <span className="text-sm text-gray-500">
-                          ({data.score.results.chords?.length || 0} chords
-                          detected)
-                        </span>
                       </div>
 
                       {data.score.results.chords &&
@@ -197,6 +328,138 @@ export default function AnalysisDisplay({
                     <p className="text-gray-500">
                       No analysis results available for this score.
                     </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="musicxml">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <IconFileMusic className="h-5 w-5" />
+                  Sheet Music Viewer
+                </CardTitle>
+                {musicXmlContent && (
+                  <div className="text-sm text-gray-500">
+                    Rendered from: {data?.score?.title || "Untitled Score"}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                {musicXmlContent ? (
+                  <div className="space-y-4">
+                    {/* Status indicator */}
+                    {musicXmlError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>
+                          Failed to load sheet music: {musicXmlError}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {musicXmlError && (
+                      <Alert className="mb-4">
+                        <AlertDescription>
+                          <div className="flex items-center justify-between">
+                            <span>
+                              Error loading sheet music: {musicXmlError}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={retryFetch}
+                              className="ml-4"
+                            >
+                              Retry
+                            </Button>
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* Debug info */}
+                    {/* <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
+                      <div>
+                        MusicXML loaded successfully ({musicXmlContent.length}{" "}
+                        characters)
+                      </div>
+                      <div>URL: {data?.score?.musicxml_url}</div>
+                    </div> */}
+
+                    {musicXmlLoaded && !musicXmlError && (
+                      <Alert>
+                        <AlertDescription className="text-green-700">
+                          Sheet music loaded successfully! You can scroll and
+                          zoom to explore the notation.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* OSMD Component */}
+                    <div className="w-full min-h-[600px] bg-white rounded-lg border border-gray-200">
+                      <OSMDComponent
+                        musicXML={musicXmlContent}
+                        showLoadingSpinner={true}
+                        onLoad={handleMusicLoad}
+                        onError={handleMusicError}
+                        renderingOptions={renderOptions}
+                        className="w-full h-full"
+                        height={600}
+                      />
+                    </div>
+
+                    {/* Additional controls or info */}
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <div>Use mouse wheel to zoom, click and drag to pan</div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const blob = new Blob([musicXmlContent], {
+                              type: "application/xml",
+                            });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = "score.musicxml";
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          Download MusicXML
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 mb-4">
+                      <IconFileMusic className="h-16 w-16 mx-auto" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No MusicXML Available
+                    </h3>
+                    <p className="text-gray-500 max-w-md mx-auto">
+                      The sheet music notation is not available for this score.
+                      This could happen if the analysis is still processing or
+                      if the original image couldn't be converted to MusicXML
+                      format.
+                    </p>
+                    {data?.score && !data.score.processed && (
+                      <div className="mt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => refetch()}
+                          className="flex items-center gap-2"
+                        >
+                          <IconRefresh className="h-4 w-4" />
+                          Check Again
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
