@@ -22,8 +22,8 @@ export function Layout({ children }: { children: ReactNode }) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const navigationItems = [
-    { icon: IconHome2, label: "Notanalyz", link: "/" },
-    { icon: IconFiles, label: "NotaDB", link: "/notadb" },
+    { icon: IconHome2, label: "Analyzr", link: "/" },
+    { icon: IconFiles, label: "Collection", link: "/notadb" },
     { icon: IconUpload, label: "Upload New", link: "/upload" },
   ];
 
