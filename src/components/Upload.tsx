@@ -117,7 +117,7 @@ export default function PDFUploader() {
         year: null,
       });
       setFiles([]);
-      router.push("/library");
+      router.push("/notadb");
     },
     onError: (error: any) => {
       notifications.show({
