@@ -13,7 +13,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
-import { useScoreSummary } from "@/hooks/useScoreSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import OSMDComponent from "./OSMDComponent";
@@ -29,13 +28,6 @@ export default function AnalysisDisplay({
   onProcessingChange,
 }: AnalysisDisplayProps) {
   const { scoreData: data, isLoading, error, refetch } = useScoreData();
-  const {
-    summary,
-    isGenerating,
-    error: summaryError,
-    generateSummary,
-    canGenerate,
-  } = useScoreSummary();
 
   // OSMD-related state
   const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
@@ -475,97 +467,35 @@ export default function AnalysisDisplay({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {!canGenerate ? (
-                  <Alert>
-                    <AlertDescription>
-                      Analysis results are required before generating an AI
-                      summary.
-                    </AlertDescription>
-                  </Alert>
+                <Alert>
+                  <AlertDescription>
+                    Analysis results are required before generating an AI
+                    summary.
+                  </AlertDescription>
+                </Alert>
                 ) : !summary && !isGenerating ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">
-                      Generate an AI-powered musical analysis and summary of
-                      this score.
-                    </p>
-                    <Button
-                      onClick={generateSummary}
-                      className="flex items-center gap-2"
-                    >
-                      <IconSparkles className="h-4 w-4" />
-                      Generate AI Summary
-                    </Button>
-                  </div>
-                ) : isGenerating ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-2"></div>
-                    <p>Generating AI summary...</p>
-                  </div>
-                ) : summaryError ? (
-                  <div className="space-y-4">
-                    <Alert variant="destructive">
-                      <AlertDescription>{summaryError}</AlertDescription>
-                    </Alert>
-                    <Button onClick={generateSummary} variant="outline">
-                      <IconRefresh className="mr-2 h-4 w-4" /> Retry
-                    </Button>
-                  </div>
-                ) : summary ? (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Summary</h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.summary}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Musical Characteristics
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.musicalCharacteristics}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Harmonic Analysis
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.harmonicAnalysis}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Structural Insights
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.structuralInsights}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Performance Notes
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.performanceNotes}
-                      </p>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button
-                        onClick={generateSummary}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <IconRefresh className="mr-2 h-4 w-4" /> Regenerate
-                      </Button>
-                    </div>
-                  </div>
-                ) : null}
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">
+                    Generate an AI-powered musical analysis and summary of this
+                    score.
+                  </p>
+                  <Button
+                    // onClick={generateSummary}
+                    className="flex items-center gap-2"
+                  >
+                    <IconSparkles className="h-4 w-4" />
+                    Generate AI Summary
+                  </Button>
+                </div>
+                <div className="flex justify-end pt-4">
+                  <Button
+                    // onClick={generateSummary}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <IconRefresh className="mr-2 h-4 w-4" /> Regenerate
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
