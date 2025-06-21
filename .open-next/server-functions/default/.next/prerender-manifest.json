@@ -30,30 +30,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/notadb": {
       "experimentalBypassFor": [
         {
@@ -101,13 +77,37 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
+    },
+    "/": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "1ee3d71cc7a4f530d802c6034f37d877",
-    "previewModeSigningKey": "9b3c24bdcd7c011a7b04416a40755be5d003096858d114d25052345e75822cf3",
-    "previewModeEncryptionKey": "fe5e9bfd8325aefc9833a5c52aae9e94a83be685007170df251173c8efbe086d"
+    "previewModeId": "dabb944c9aec06088ac40aeef6d89967",
+    "previewModeSigningKey": "67fc35e188ebe98c9301ea3ebc3472b6a23f2e18396d2134037dba0a2f45f054",
+    "previewModeEncryptionKey": "ab0a5562d5b3196074a1507dbca3c8c775c51060574439674e6fe5e9fc15012f"
   }
 }

@@ -39,3 +39,7 @@ next-env.d.ts
 
 .genkit/*
 open-next.config.ts
+
+.env
+.env.local
+*.env
