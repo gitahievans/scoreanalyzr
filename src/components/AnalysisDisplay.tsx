@@ -196,6 +196,201 @@ export default function AnalysisDisplay({
   }
 
   return (
+import { ScoreData } from "@/types/analysis"; // Import ScoreData type
+import { useAISummary } from "@/hooks/useAISummary"; // Import the new hook
+import ReactMarkdown from 'react-markdown'; // For rendering markdown
+
+// ... (keep existing imports)
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+interface AnalysisDisplayProps {
+  onProcessingChange: (isProcessing: boolean) => void;
+}
+
+export default function AnalysisDisplay({
+  onProcessingChange,
+}: AnalysisDisplayProps) {
+  const { scoreData: data, isLoading, error, refetch } = useScoreData();
+
+  // AI Summary Hook
+  const {
+    summary: aiSummary,
+    isLoading: isGeneratingSummary,
+    error: summaryError,
+    generateSummary,
+    resetSummary,
+  } = useAISummary();
+
+  // OSMD-related state
+  const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
+  const [musicXmlError, setMusicXmlError] = useState<string | null>(null);
+  const [renderOptions] = useState({
+    drawTitle: true,
+    drawComposer: true,
+    drawFingerings: false,
+  });
+  const [musicXmlContent, setMusicXmlContent] = useState<string | null>(null);
+  const [fetchAttempts, setFetchAttempts] = useState(0);
+
+  console.log("ScoreData from context:", data);
+
+  useEffect(() => {
+    if (data?.score?.processed || data?.task_status?.state === "FAILURE") {
+      onProcessingChange(false);
+    } else if (data?.task_status?.state === "PENDING" || isLoading) {
+      onProcessingChange(true);
+    }
+  }, [data, isLoading, onProcessingChange]);
+
+  useEffect(() => {
+    if (data?.score?.processed && data?.task_status?.state !== "PENDING") {
+      const fetchMusicXml = async () => {
+        try {
+          console.log(
+            "Attempting to fetch MusicXML from:",
+            `${API_URL}${data?.score?.musicxml_url}`
+          );
+
+          const response = await fetch(
+            `${API_URL}${data?.score?.musicxml_url}`,
+            {
+              method: "GET",
+              headers: {
+                Accept:
+                  "application/xml, text/xml, application/vnd.recordare.musicxml+xml, */*",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP error! status: ${response.status} - ${response.statusText}`
+            );
+          }
+
+          const contentType = response.headers.get("content-type");
+          console.log("Response content type:", contentType);
+          const textContent = await response.text();
+          console.log("Response length:", textContent.length);
+          console.log("First 200 characters:", textContent.substring(0, 200));
+
+          if (
+            !textContent.trim().startsWith("<?xml") &&
+            !textContent.trim().startsWith("<")
+          ) {
+            throw new Error("Response is not valid XML format");
+          }
+          if (
+            !textContent.includes("score-partwise") &&
+            !textContent.includes("score-timewise")
+          ) {
+            console.warn(
+              "Warning: Content doesn't appear to be MusicXML format"
+            );
+          }
+
+          setMusicXmlContent(textContent);
+          setMusicXmlError(null);
+          setFetchAttempts(0);
+          console.log("MusicXML fetched successfully");
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Unknown error";
+          console.error("Failed to fetch MusicXML:", errorMessage);
+
+          if (
+            fetchAttempts < 3 &&
+            (errorMessage.includes("network") ||
+              errorMessage.includes("timeout"))
+          ) {
+            console.log(`Retrying fetch attempt ${fetchAttempts + 1}/3`);
+            setFetchAttempts((prev) => prev + 1);
+            setTimeout(() => {
+              // Retry after a delay
+            }, 2000 * (fetchAttempts + 1));
+            return;
+          }
+
+          setMusicXmlError(`Failed to fetch MusicXML: ${errorMessage}`);
+          setMusicXmlContent(null);
+          setFetchAttempts(0);
+        }
+      };
+
+      fetchMusicXml();
+    }
+  }, [data?.score?.processed, data?.score?.musicxml_url, data?.task_status?.state, fetchAttempts]); // Added data?.score?.musicxml_url to dependencies
+
+  const handleMusicLoad = () => {
+    console.log("MusicXML loaded successfully in OSMD");
+    setMusicXmlLoaded(true);
+    setMusicXmlError(null);
+  };
+
+  const handleMusicError = (errorMsg: string) => { // Corrected type from error to errorMsg
+    console.error("OSMD Error:", errorMsg);
+    setMusicXmlError(errorMsg);
+    setMusicXmlLoaded(false);
+  };
+
+  const retryFetch = () => {
+    setFetchAttempts(0);
+    setMusicXmlError(null);
+    setMusicXmlContent(null);
+    refetch();
+  };
+
+  const handleGenerateSummary = () => {
+    if (data) {
+      // Type assertion if confident 'data' conforms to ScoreData, or ensure 'data' is correctly typed from useScoreData
+      generateSummary(data as ScoreData);
+    } else {
+      console.error("Cannot generate summary: ScoreData is not available.");
+      // Optionally, set an error state here or show a notification
+    }
+  };
+
+
+  if (error) {
+    return (
+      <div className="space-y-6 p-4">
+        <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
+          <IconMusic className="h-6 w-6" /> Score Analysis Results
+        </h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Error Loading Score Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{error.message}</p>
+            <Button className="mt-4" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="space-y-6 p-4">
+        <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
+          <IconMusic className="h-6 w-6" /> Score Analysis Results
+        </h2>
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-gray-500">
+              Upload or select a score to see analysis results.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
     <div className="space-y-6 p-4">
       <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
         <IconMusic className="h-6 w-6" /> Score Analysis Results
@@ -215,7 +410,7 @@ export default function AnalysisDisplay({
           </CardContent>
         </Card>
       ) : (
-        <Tabs defaultValue="results" className="w-full">
+        <Tabs defaultValue="results" className="w-full" onValueChange={resetSummary}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="results">Analysis Results</TabsTrigger>
             <TabsTrigger value="musicxml">Sheet Music</TabsTrigger>
@@ -259,7 +454,6 @@ export default function AnalysisDisplay({
                         </div>
                       </div>
 
-                      {/* Add MusicXML availability indicator */}
                       <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
                         <div className="text-sm font-medium text-purple-600 mb-1">
                           MusicXML
@@ -273,7 +467,6 @@ export default function AnalysisDisplay({
                       </div>
                     </div>
 
-                    {/* Chord Progression Section */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-semibold text-gray-800">
@@ -342,21 +535,12 @@ export default function AnalysisDisplay({
               <CardContent>
                 {musicXmlContent ? (
                   <div className="space-y-4">
-                    {/* Status indicator */}
                     {musicXmlError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>
-                          Failed to load sheet music: {musicXmlError}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {musicXmlError && (
-                      <Alert className="mb-4">
+                      <Alert variant="destructive" className="mb-4">
                         <AlertDescription>
                           <div className="flex items-center justify-between">
                             <span>
-                              Error loading sheet music: {musicXmlError}
+                              Failed to load sheet music: {musicXmlError}
                             </span>
                             <Button
                               variant="outline"
@@ -370,16 +554,6 @@ export default function AnalysisDisplay({
                         </AlertDescription>
                       </Alert>
                     )}
-
-                    {/* Debug info */}
-                    {/* <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
-                      <div>
-                        MusicXML loaded successfully ({musicXmlContent.length}{" "}
-                        characters)
-                      </div>
-                      <div>URL: {data?.score?.musicxml_url}</div>
-                    </div> */}
-
                     {musicXmlLoaded && !musicXmlError && (
                       <Alert>
                         <AlertDescription className="text-green-700">
@@ -388,8 +562,6 @@ export default function AnalysisDisplay({
                         </AlertDescription>
                       </Alert>
                     )}
-
-                    {/* OSMD Component */}
                     <div className="w-full min-h-[600px] bg-white rounded-lg border border-gray-200">
                       <OSMDComponent
                         musicXML={musicXmlContent}
@@ -401,8 +573,6 @@ export default function AnalysisDisplay({
                         height={600}
                       />
                     </div>
-
-                    {/* Additional controls or info */}
                     <div className="flex justify-between items-center text-sm text-gray-500">
                       <div>Use mouse wheel to zoom, click and drag to pan</div>
                       <div className="flex gap-2">
@@ -410,16 +580,18 @@ export default function AnalysisDisplay({
                           variant="outline"
                           size="sm"
                           onClick={() => {
+                            if (!musicXmlContent) return;
                             const blob = new Blob([musicXmlContent], {
                               type: "application/xml",
                             });
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement("a");
                             a.href = url;
-                            a.download = "score.musicxml";
+                            a.download = `${data?.score?.title?.replace('.pdf', '') || 'score'}.musicxml`;
                             a.click();
                             URL.revokeObjectURL(url);
                           }}
+                          disabled={!musicXmlContent}
                         >
                           Download MusicXML
                         </Button>
@@ -466,36 +638,66 @@ export default function AnalysisDisplay({
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <Alert>
-                  <AlertDescription>
-                    Analysis results are required before generating an AI
-                    summary.
-                  </AlertDescription>
-                </Alert>
-                ) : !summary && !isGenerating ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">
-                    Generate an AI-powered musical analysis and summary of this
-                    score.
-                  </p>
-                  <Button
-                    // onClick={generateSummary}
-                    className="flex items-center gap-2"
-                  >
-                    <IconSparkles className="h-4 w-4" />
-                    Generate AI Summary
-                  </Button>
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button
-                    // onClick={generateSummary}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <IconRefresh className="mr-2 h-4 w-4" /> Regenerate
-                  </Button>
-                </div>
+              <CardContent className="space-y-4">
+                {!data?.score?.results ? (
+                  <Alert>
+                    <AlertDescription>
+                      Analysis results are required before generating an AI
+                      summary. Please wait for the initial analysis to complete or select a score with results.
+                    </AlertDescription>
+                  </Alert>
+                ) : isGeneratingSummary ? (
+                  <div className="flex items-center justify-center p-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mr-3"></div>
+                    <p className="text-purple-700">Generating AI insights... This may take a moment.</p>
+                  </div>
+                ) : summaryError ? (
+                  <Alert variant="destructive">
+                    <IconX className="h-4 w-4" />
+                    <AlertDescription>
+                      <p className="font-semibold mb-1">Error generating AI summary:</p>
+                      <p className="text-sm mb-3">{summaryError.message}</p>
+                      <Button
+                        onClick={handleGenerateSummary}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <IconRefresh className="h-4 w-4" />
+                        Retry Generation
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                ) : aiSummary ? (
+                  <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none p-4 bg-gray-50 rounded-md border">
+                    <ReactMarkdown>{aiSummary}</ReactMarkdown>
+                    <div className="flex justify-end pt-4 mt-4 border-t">
+                      <Button
+                        onClick={handleGenerateSummary}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <IconRefresh className="h-4 w-4" /> Regenerate
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <IconSparkles className="h-12 w-12 mx-auto text-purple-400 mb-3" />
+                    <p className="text-gray-600 mb-4">
+                      Unlock deeper musical understanding. Generate an AI-powered analysis of this score.
+                    </p>
+                    <Button
+                      onClick={handleGenerateSummary}
+                      disabled={!data || !data.score?.results}
+                      className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <IconSparkles className="h-4 w-4" />
+                      Generate AI Summary
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
