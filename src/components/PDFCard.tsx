@@ -32,7 +32,7 @@ const PDFCard = ({ pdf }: { pdf: FileType }) => {
 
     try {
       const response: Response = await fetch(
-        `https://nota-db.onrender.com/api/download/${pdf.id}/download`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/download/${pdf.id}/download`
       );
       const blob: PDFBlob = (await response.blob()) as PDFBlob;
       const url: string = window.URL.createObjectURL(blob);

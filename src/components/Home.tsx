@@ -34,7 +34,9 @@ const Home = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/files/");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/files/`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch files");
         }

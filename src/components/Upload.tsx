@@ -48,10 +48,13 @@ const uploadScore = async (formData: FormDataType): Promise<UploadResponse> => {
   );
   payload.append("analyze", "false");
 
-  const response = await fetch("http://127.0.0.1:8000/api/upload/", {
-    method: "POST",
-    body: payload,
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/upload/`,
+    {
+      method: "POST",
+      body: payload,
+    }
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -79,7 +82,7 @@ export default function PDFUploader() {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://nota-db.onrender.com/api/categories/"
+          `${process.env.NEXT_PUBLIC_API_URL}/api/categories/`
         );
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();

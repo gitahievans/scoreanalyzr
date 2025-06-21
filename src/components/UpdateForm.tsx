@@ -59,7 +59,7 @@ const UpdateForm = ({ pdf, isEditing, setIsEditing }: UpdateFormProps) => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://nota-db.onrender.com/api/categories/"
+          `${process.env.NEXT_PUBLIC_API_URL}/api/categories/`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
@@ -83,7 +83,7 @@ const UpdateForm = ({ pdf, isEditing, setIsEditing }: UpdateFormProps) => {
 
     try {
       const response = await fetch(
-        `https://nota-db.onrender.com/api/update/${pdf.id}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/update/${pdf.id}/`,
         {
           method: "PUT",
           headers: {
