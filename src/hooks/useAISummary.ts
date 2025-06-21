@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react';
-import { ScoreData, AISummaryResponse } from '@/types/analysis';
+import { ScoreData } from '@/types/analysis'; // ScoreData remains the input from the component
+import { AISummaryResponse, AISummaryErrorResponse } from '@/types/ai-summary'; // New structured response types
 
 interface UseAISummaryState {
-  summary: string | null;
+  summary: AISummaryResponse | null; // Summary is now the structured object
   isLoading: boolean;
-  error: Error | null;
+  error: Error | null; // To store error messages/objects
 }
 
 interface UseAISummaryReturn extends UseAISummaryState {
-  generateSummary: (scoreData: ScoreData, retries?: number) => Promise<void>;
+  generateSummary: (scoreData: ScoreData) => Promise<void>; // Retries are handled internally
   resetSummary: () => void;
 }
 
@@ -16,7 +17,7 @@ const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
 
 export const useAISummary = (): UseAISummaryReturn => {
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<AISummaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -26,82 +27,89 @@ export const useAISummary = (): UseAISummaryReturn => {
     setError(null);
   }, []);
 
-  const generateSummary = useCallback(
+  const generateSummaryInternal = useCallback(
     async (scoreData: ScoreData, attempt: number = 1) => {
+      // This internal function handles retries. The public generateSummary won't expose attempt.
       setIsLoading(true);
-      setError(null);
-      setSummary(null); // Clear previous summary before a new attempt
+      if (attempt === 1) { // Clear previous state only on the first attempt of a new generation request
+        setError(null);
+        setSummary(null);
+      }
 
-      console.log(`Attempt ${attempt}: Generating AI summary for score ID ${scoreData.score?.id}`);
+      console.log(`Attempt ${attempt}/${MAX_RETRIES}: Generating AI summary for score ID ${scoreData.score?.id}`);
 
       try {
         if (!scoreData || !scoreData.score || !scoreData.score.results) {
+          // This validation should ideally happen before calling, but good as a safeguard.
           throw new Error("Complete score data with analysis results is required to generate an AI summary.");
         }
 
-        const response = await fetch('/api/generate-summary', {
+        const response = await fetch('/api/ai-summary', { // Updated API endpoint
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json', // Explicitly accept JSON
           },
-          body: JSON.stringify({ scoreData }), // Ensure body is { scoreData: ... }
+          body: JSON.stringify({ scoreData }),
         });
 
-        console.log(`Response status: ${response.status}`);
-        const responseBody: AISummaryResponse = await response.json();
-        // console.log("Response body from API:", responseBody);
+        const responseBody = await response.json();
+        // console.log(`Response status: ${response.status}`, responseBody);
 
         if (!response.ok) {
-          const errorMessage = responseBody.error || `API request failed with status ${response.status}`;
-          const errorDetails = (responseBody as any).details || 'No additional details.';
+          // Try to parse as AISummaryErrorResponse
+          const apiError = responseBody as AISummaryErrorResponse;
+          const errorMessage = apiError.error || `API request failed with status ${response.status}`;
+          const errorDetails = apiError.details ? (typeof apiError.details === 'string' ? apiError.details : JSON.stringify(apiError.details)) : 'No additional details.';
           console.error(`API Error: ${errorMessage}`, errorDetails);
-          throw new Error(`${errorMessage} Details: ${typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails)}`);
+          throw new Error(`${errorMessage} - Details: ${errorDetails}`); // Include status for retry logic
         }
 
-        if (responseBody.summary) {
-          setSummary(responseBody.summary);
-          console.log("AI Summary fetched successfully.");
-        } else {
-          // This case should ideally be covered by !response.ok, but as a fallback:
-          throw new Error("Received success status but no summary in response.");
-        }
+        // Successfully fetched and response.ok, responseBody should be AISummaryResponse
+        setSummary(responseBody as AISummaryResponse);
+        setError(null); // Clear any previous transient error
+        setIsLoading(false);
+        console.log("AI Summary fetched and parsed successfully.");
 
       } catch (err: any) {
-        console.error(`Error generating summary (attempt ${attempt}):`, err);
+        console.error(`Error generating summary (attempt ${attempt}/${MAX_RETRIES}):`, err.message);
 
-        // Retry logic for network errors or specific server errors (e.g., 5xx)
-        // For client errors (4xx), typically we don't retry as the request itself is likely flawed.
-        const httpStatusCode = err.message.match(/status (\d+)/)?.[1]; //簡易的にステータスコードを抽出
-        const isRetryableError = !httpStatusCode || parseInt(httpStatusCode, 10) >= 500;
+        let isRetryable = false;
+        if (err instanceof TypeError && err.message.toLowerCase().includes('failed to fetch')) {
+            // Network error
+            isRetryable = true;
+        } else if (err.message) {
+            // Check for HTTP status codes in the error message if thrown by our !response.ok logic
+            const match = err.message.match(/status (\d+)/i);
+            const statusCode = match ? parseInt(match[1], 10) : null;
+            if (statusCode && statusCode >= 500 && statusCode <= 599) {
+                isRetryable = true;
+            }
+        }
 
 
-        if (isRetryableError && attempt < MAX_RETRIES) {
+        if (isRetryable && attempt < MAX_RETRIES) {
           const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1); // Exponential backoff
           console.log(`Retrying in ${delay}ms... (attempt ${attempt + 1}/${MAX_RETRIES})`);
-          setTimeout(() => generateSummary(scoreData, attempt + 1), delay);
-          // Keep isLoading true during retry attempts
           setError(new Error(`Failed after attempt ${attempt}. Retrying... (${err.message})`)); // Show transient error
-          return; // Exit current attempt, next one will be scheduled
+          // Keep isLoading true
+          setTimeout(() => generateSummaryInternal(scoreData, attempt + 1), delay);
         } else {
           // Max retries reached or non-retryable error
           setError(new Error(err.message || 'An unknown error occurred while generating the summary.'));
-          setIsLoading(false); // Stop loading only after final attempt or non-retryable error
-          return; // Ensure we exit
+          setIsLoading(false);
+          setSummary(null); // Ensure summary is cleared on final error
         }
       }
-      // Only set isLoading to false if not retrying and no error occurred that prevented it
-      // Or if it's the final error state
-      if (!error && summary) { // if error is null and summary is set
-         setIsLoading(false);
-      } else if (error && attempt >= MAX_RETRIES) { // if there's an error and max retries hit
-         setIsLoading(false);
-      }
-      // If an error occurred and we're not retrying, isLoading is set to false in the catch block.
-      // If successful, isLoading should be set to false.
-      setIsLoading(false); // General case for success or final failure.
     },
-    [] // No dependencies, relies on arguments
+    [] // No external dependencies for useCallback, relies on arguments
   );
+
+  // Public function to initiate the process
+  const generateSummary = useCallback((scoreData: ScoreData) => {
+    generateSummaryInternal(scoreData, 1); // Start with attempt 1
+  }, [generateSummaryInternal]);
+
 
   return { summary, isLoading, error, generateSummary, resetSummary };
 };

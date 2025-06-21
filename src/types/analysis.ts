@@ -75,17 +75,15 @@ export interface ScoreData {
 }
 
 // Request to our API route
+// This is still relevant as the input to the /api/ai-summary route will be the full ScoreData object.
 export interface AISummaryRequest {
   scoreData: ScoreData;
 }
 
-// Response from our API route (which is the AI summary itself or an error)
-export interface AISummaryResponse {
-  summary?: string;
-  error?: string;
-}
-
 // For structured AI output, if we want the AI to return a JSON object
+// This has been moved to src/types/ai-summary.ts as a structured response.
+// The old AISummaryResponse (string summary) is no longer needed here.
+// export interface StructuredAISummary {
 // This is a more advanced approach, for now, we'll expect a text summary.
 // export interface StructuredAISummary {
 //   musicalOverview: string;

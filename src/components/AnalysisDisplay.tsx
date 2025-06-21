@@ -196,11 +196,12 @@ export default function AnalysisDisplay({
   }
 
   return (
-import { ScoreData } from "@/types/analysis"; // Import ScoreData type
-import { useAISummary } from "@/hooks/useAISummary"; // Import the new hook
+import { ScoreData, ScoreDataResults } from "@/types/analysis"; // Import ScoreData type, ensure ScoreDataResults is available if needed elsewhere
+import { useAISummary } from "@/hooks/useAISummary"; // Import the updated hook
 import ReactMarkdown from 'react-markdown'; // For rendering markdown
+import { AISummaryResponse } from "@/types/ai-summary"; // Import the structured response type
 
-// ... (keep existing imports)
+// ... (keep existing imports, ensure no conflicts with IconX or other icons)
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -638,12 +639,11 @@ export default function AnalysisDisplay({
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6"> {/* Increased spacing for better readability of sections */}
                 {!data?.score?.results ? (
                   <Alert>
                     <AlertDescription>
-                      Analysis results are required before generating an AI
-                      summary. Please wait for the initial analysis to complete or select a score with results.
+                      Analysis results are required before generating an AI summary. Please wait for the initial analysis to complete or select a score with results.
                     </AlertDescription>
                   </Alert>
                 ) : isGeneratingSummary ? (
@@ -653,7 +653,7 @@ export default function AnalysisDisplay({
                   </div>
                 ) : summaryError ? (
                   <Alert variant="destructive">
-                    <IconX className="h-4 w-4" />
+                    <IconX className="h-4 w-4 mr-2" /> {/* Ensure IconX is imported or available */}
                     <AlertDescription>
                       <p className="font-semibold mb-1">Error generating AI summary:</p>
                       <p className="text-sm mb-3">{summaryError.message}</p>
@@ -669,8 +669,22 @@ export default function AnalysisDisplay({
                     </AlertDescription>
                   </Alert>
                 ) : aiSummary ? (
-                  <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none p-4 bg-gray-50 rounded-md border">
-                    <ReactMarkdown>{aiSummary}</ReactMarkdown>
+                  <div className="space-y-4">
+                    {(Object.keys(aiSummary) as Array<keyof AISummaryResponse>).map((key) => {
+                      if (aiSummary[key]) { // Only render if the field has content
+                        // Create a more readable title from the key
+                        const title = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                        return (
+                          <div key={key} className="p-4 bg-gray-50 rounded-md border">
+                            <h4 className="text-md font-semibold text-gray-700 mb-2">{title}</h4>
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown>{aiSummary[key]}</ReactMarkdown>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
                     <div className="flex justify-end pt-4 mt-4 border-t">
                       <Button
                         onClick={handleGenerateSummary}
@@ -690,11 +704,11 @@ export default function AnalysisDisplay({
                     </p>
                     <Button
                       onClick={handleGenerateSummary}
-                      disabled={!data || !data.score?.results}
+                      disabled={!data || !data.score?.results || isGeneratingSummary}
                       className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white"
                     >
                       <IconSparkles className="h-4 w-4" />
-                      Generate AI Summary
+                      {isGeneratingSummary ? "Generating..." : "Generate AI Summary"}
                     </Button>
                   </div>
                 )}

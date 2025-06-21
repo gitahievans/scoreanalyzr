@@ -4,8 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -16,11 +14,8 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@genkit-ai/ai": "^1.13.0",
-    "@genkit-ai/core": "^1.13.0",
-    "@genkit-ai/googleai": "^1.13.0",
-    "@genkit-ai/next": "^1.0.4",
     "@hookform/resolvers": "^4.1.3",
+    "@langchain/google-genai": "^0.2.13",
     "@mantine/carousel": "^7.13.4",
     "@mantine/core": "^7.17.5",
     "@mantine/dropzone": "^7.13.4",
@@ -61,7 +56,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^7.1.0",
     "firebase": "^11.3.0",
-    "genkit": "^1.13.0",
+    "langchain": "^0.3.29",
     "lucide-react": "^0.475.0",
     "next": "15.2.3",
     "opensheetmusicdisplay": "^1.9.0",
@@ -95,7 +90,6 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "genkit-cli": "^1.0.4",
     "globals": "^15.11.0",
     "postcss": "^8.5.3",
     "postcss-preset-mantine": "^1.17.0",
