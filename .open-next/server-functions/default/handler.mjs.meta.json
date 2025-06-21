@@ -3170,13 +3170,13 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
-      "bytes": 233057,
+    ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js": {
+      "bytes": 233062,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js": {
-      "bytes": 233062,
+    ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
+      "bytes": 233057,
       "imports": [],
       "format": "cjs"
     },
@@ -3209,14 +3209,14 @@
           "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\_not-found\\page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\upload\\page_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\notadb\\page_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\upload\\page_client-reference-manifest.js"
         }
       ],
       "format": "cjs"
@@ -6818,11 +6818,11 @@
         ".open-next/server-functions/default/.next/server/app/_not-found/page_client-reference-manifest.js": {
           "bytesInOutput": 218374
         },
-        ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
-          "bytesInOutput": 218557
-        },
         ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js": {
           "bytesInOutput": 218562
+        },
+        ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
+          "bytesInOutput": 218557
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.js": {
           "bytesInOutput": 9342
