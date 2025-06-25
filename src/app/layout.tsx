@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   description: "Analyze your music scores with AI",
 };
 
+export const runtime = "edge";
+
 export default function RootLayout({
   children,
 }: Readonly<{

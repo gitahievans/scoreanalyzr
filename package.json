@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.0.4",
@@ -72,6 +73,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.12",
     "@eslint/js": "^9.13.0",
     "@types/node": "^20",
     "@types/react": "^18.3.12",
