@@ -74,7 +74,14 @@ export async function generateSummaryFromResults(
   input: GenerateSummaryFromResultsInput
 ): Promise<GenerateSummaryFromResultsOutput> {
   try {
-    const response = await fetch("/api/generate-summary", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    const endpoint = apiUrl.endsWith("/")
+      ? `${apiUrl}api/generate-summary`
+      : `${apiUrl}/api/generate-summary`;
+
+    console.log("Making request to:", endpoint);
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
