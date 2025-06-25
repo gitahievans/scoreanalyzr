@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import OSMDComponent from "./OSMDComponent";
 import { Brain, FileMusic, Music, RefreshCcw, Sparkles } from "lucide-react";
-import { useErrorBoundary } from "react-error-boundary";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -29,7 +28,6 @@ export default function AnalysisDisplay({
     canGenerate,
     clearSummary,
   } = useScoreSummary();
-  const { showBoundary } = useErrorBoundary();
 
   // OSMD-related state
   const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
@@ -182,11 +180,11 @@ export default function AnalysisDisplay({
   };
 
   // Handle summary errors with error boundary
-  useEffect(() => {
-    if (summaryError) {
-      showBoundary(new Error(summaryError));
-    }
-  }, [summaryError, showBoundary]);
+  // useEffect(() => {
+  //   if (summaryError) {
+  //     showBoundary(new Error(summaryError));
+  //   }
+  // }, [summaryError, showBoundary]);
 
   if (error) {
     return (
