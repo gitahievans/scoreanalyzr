@@ -1,14 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
-// import {
-//   Music,
-//   IconX,
-//   RefreshCcw,
-//   IconSparkles,
-//   IconBrain,
-//   FileMusic,
-// } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
@@ -84,16 +76,13 @@ export default function AnalysisDisplay({
             );
           }
 
-          // Check content type
           const contentType = response.headers.get("content-type");
           console.log("Response content type:", contentType);
 
-          // Get the response as text first to inspect it
           const textContent = await response.text();
           console.log("Response length:", textContent.length);
           console.log("First 200 characters:", textContent.substring(0, 200));
 
-          // Validate that it's actually XML
           if (
             !textContent.trim().startsWith("<?xml") &&
             !textContent.trim().startsWith("<")
@@ -101,7 +90,6 @@ export default function AnalysisDisplay({
             throw new Error("Response is not valid XML format");
           }
 
-          // Additional validation for MusicXML
           if (
             !textContent.includes("score-partwise") &&
             !textContent.includes("score-timewise")
@@ -120,7 +108,6 @@ export default function AnalysisDisplay({
             err instanceof Error ? err.message : "Unknown error";
           console.error("Failed to fetch MusicXML:", errorMessage);
 
-          // Retry logic for transient failures
           if (
             fetchAttempts < 3 &&
             (errorMessage.includes("network") ||
@@ -165,6 +152,33 @@ export default function AnalysisDisplay({
     refetch();
   };
 
+  // Create a properly structured data object for the summary generation
+  const createSummaryData = () => {
+    if (!data?.score?.results) return null;
+
+    return {
+      score: {
+        processed: data.score.processed,
+        // Map results to analysis_results for the hook
+        analysis_results: data.score.results,
+        title: data.score.title,
+      },
+      task_status: data.task_status,
+    };
+  };
+
+  // Handle generate summary button click
+  const handleGenerateSummary = () => {
+    const summaryData = createSummaryData();
+    console.log("Generating summary with data:", summaryData);
+
+    if (summaryData) {
+      generateSummary(summaryData);
+    } else {
+      console.error("No valid data for summary generation");
+    }
+  };
+
   if (error) {
     return (
       <div className="space-y-6 p-4">
@@ -202,6 +216,10 @@ export default function AnalysisDisplay({
       </div>
     );
   }
+
+  // Check if summary generation is possible
+  const summaryData = createSummaryData();
+  const canGenerateSummary = summaryData ? canGenerate(summaryData) : false;
 
   return (
     <div className="space-y-6 p-4">
@@ -267,7 +285,6 @@ export default function AnalysisDisplay({
                         </div>
                       </div>
 
-                      {/* Add MusicXML availability indicator */}
                       <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
                         <div className="text-sm font-medium text-purple-600 mb-1">
                           MusicXML
@@ -350,7 +367,6 @@ export default function AnalysisDisplay({
               <CardContent>
                 {musicXmlContent ? (
                   <div className="space-y-4">
-                    {/* Status indicator */}
                     {musicXmlError && (
                       <Alert variant="destructive">
                         <AlertDescription>
@@ -379,15 +395,6 @@ export default function AnalysisDisplay({
                       </Alert>
                     )}
 
-                    {/* Debug info */}
-                    {/* <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
-                      <div>
-                        MusicXML loaded successfully ({musicXmlContent.length}{" "}
-                        characters)
-                      </div>
-                      <div>URL: {data?.score?.musicxml_url}</div>
-                    </div> */}
-
                     {musicXmlLoaded && !musicXmlError && (
                       <Alert>
                         <AlertDescription className="text-green-700">
@@ -397,7 +404,6 @@ export default function AnalysisDisplay({
                       </Alert>
                     )}
 
-                    {/* OSMD Component */}
                     <div className="w-full min-h-[600px] bg-white rounded-lg border border-gray-200">
                       <OSMDComponent
                         musicXML={musicXmlContent}
@@ -410,7 +416,6 @@ export default function AnalysisDisplay({
                       />
                     </div>
 
-                    {/* Additional controls or info */}
                     <div className="flex justify-between items-center text-sm text-gray-500">
                       <div>Use mouse wheel to zoom, click and drag to pan</div>
                       <div className="flex gap-2">
@@ -475,11 +480,27 @@ export default function AnalysisDisplay({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {!canGenerate ? (
+                {!canGenerateSummary ? (
                   <Alert>
                     <AlertDescription>
                       Analysis results are required before generating an AI
                       summary.
+                      {/* Debug info - remove in production */}
+                      <details className="mt-2 text-xs">
+                        <summary>Debug Info</summary>
+                        <pre>
+                          {JSON.stringify(
+                            {
+                              hasData: !!data,
+                              processed: data?.score?.processed,
+                              hasResults: !!data?.score?.results,
+                              taskState: data?.task_status?.state,
+                            },
+                            null,
+                            2
+                          )}
+                        </pre>
+                      </details>
                     </AlertDescription>
                   </Alert>
                 ) : !summary && !isGenerating ? (
@@ -489,9 +510,7 @@ export default function AnalysisDisplay({
                       this score.
                     </p>
                     <Button
-                      onClick={() => {
-                        if (data) generateSummary(data);
-                      }}
+                      onClick={handleGenerateSummary}
                       className="flex items-center gap-2"
                     >
                       <Sparkles className="h-4 w-4" />
@@ -508,12 +527,7 @@ export default function AnalysisDisplay({
                     <Alert variant="destructive">
                       <AlertDescription>{summaryError}</AlertDescription>
                     </Alert>
-                    <Button
-                      onClick={() => {
-                        if (data) generateSummary(data);
-                      }}
-                      variant="outline"
-                    >
+                    <Button onClick={handleGenerateSummary} variant="outline">
                       <RefreshCcw className="mr-2 h-4 w-4" /> Retry
                     </Button>
                   </div>
@@ -564,9 +578,7 @@ export default function AnalysisDisplay({
 
                     <div className="flex justify-end pt-4">
                       <Button
-                        onClick={() => {
-                          if (data) generateSummary(data);
-                        }}
+                        onClick={handleGenerateSummary}
                         variant="outline"
                         size="sm"
                       >
