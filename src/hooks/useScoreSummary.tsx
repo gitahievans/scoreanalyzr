@@ -1,33 +1,30 @@
-import { useState, useEffect, useCallback } from "react";
-import { useScoreData } from "@/contexts/ScoreDataContext";
+// hooks/useScoreSummary.ts
+import { useState, useCallback } from "react";
 import {
   generateSummaryFromResults,
   GenerateSummaryFromResultsOutput,
-} from "@/ai/flows/generate-summary";
+} from "@/lib/generate-summary";
 
-interface UseScoreSummaryResult {
-  summary: GenerateSummaryFromResultsOutput | null;
-  isGenerating: boolean;
-  error: string | null;
-  generateSummary: () => Promise<void>;
-  canGenerate: boolean;
+interface ScoreData {
+  score?: {
+    processed?: boolean;
+    analysis_results?: any; // Your analysis results structure
+    title?: string;
+  };
+  task_status?: {
+    state?: string;
+  };
 }
 
-export function useScoreSummary(): UseScoreSummaryResult {
-  const { scoreData, isLoading } = useScoreData();
+export function useScoreSummary() {
   const [summary, setSummary] =
     useState<GenerateSummaryFromResultsOutput | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Determine if we can generate a summary
-  const canGenerate = Boolean(
-    scoreData?.score?.processed && scoreData?.score?.results && !isLoading
-  );
-
-  // Auto-generate summary when data becomes available
-  const generateSummary = useCallback(async () => {
-    if (!canGenerate || !scoreData?.score?.results) {
+  const generateSummary = useCallback(async (scoreData: ScoreData) => {
+    if (!scoreData?.score?.analysis_results) {
+      setError("No analysis results available to generate summary");
       return;
     }
 
@@ -35,27 +32,34 @@ export function useScoreSummary(): UseScoreSummaryResult {
     setError(null);
 
     try {
-      const summaryResult = await generateSummaryFromResults({
-        analysisResults: scoreData.score.results,
+      const result = await generateSummaryFromResults({
+        analysisResults: scoreData.score.analysis_results,
         scoreTitle: scoreData.score.title,
       });
 
-      setSummary(summaryResult);
+      setSummary(result);
     } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate summary";
+      setError(errorMessage);
       console.error("Error generating summary:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to generate summary"
-      );
     } finally {
       setIsGenerating(false);
     }
-  }, [canGenerate, scoreData]);
+  }, []);
 
-  // Reset summary when score data changes
-  useEffect(() => {
+  const canGenerate = useCallback((scoreData: ScoreData) => {
+    return Boolean(
+      scoreData?.score?.processed &&
+        scoreData?.score?.analysis_results &&
+        scoreData?.task_status?.state !== "PENDING"
+    );
+  }, []);
+
+  const clearSummary = useCallback(() => {
     setSummary(null);
     setError(null);
-  }, [scoreData?.score?.id]);
+  }, []);
 
   return {
     summary,
@@ -63,5 +67,6 @@ export function useScoreSummary(): UseScoreSummaryResult {
     error,
     generateSummary,
     canGenerate,
+    clearSummary,
   };
 }

@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { notifications } from "@mantine/notifications";
-import {
-  IconMusic,
-  IconX,
-  IconRefresh,
-  IconSparkles,
-  IconBrain,
-  IconFileMusic,
-} from "@tabler/icons-react";
+// import {
+//   Music,
+//   IconX,
+//   RefreshCcw,
+//   IconSparkles,
+//   IconBrain,
+//   FileMusic,
+// } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
@@ -17,7 +16,7 @@ import { useScoreSummary } from "@/hooks/useScoreSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import OSMDComponent from "./OSMDComponent";
-import { log } from "console";
+import { Brain, FileMusic, Music, RefreshCcw, Sparkles } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -35,6 +34,7 @@ export default function AnalysisDisplay({
     error: summaryError,
     generateSummary,
     canGenerate,
+    clearSummary,
   } = useScoreSummary();
 
   // OSMD-related state
@@ -169,7 +169,7 @@ export default function AnalysisDisplay({
     return (
       <div className="space-y-6 p-4">
         <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
-          <IconMusic className="h-6 w-6" /> Score Analysis Results
+          <Music className="h-6 w-6" /> Score Analysis Results
         </h2>
         <Card>
           <CardHeader>
@@ -190,7 +190,7 @@ export default function AnalysisDisplay({
     return (
       <div className="space-y-6 p-4">
         <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
-          <IconMusic className="h-6 w-6" /> Score Analysis Results
+          <Music className="h-6 w-6" /> Score Analysis Results
         </h2>
         <Card>
           <CardContent className="p-6 text-center">
@@ -206,7 +206,7 @@ export default function AnalysisDisplay({
   return (
     <div className="space-y-6 p-4">
       <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
-        <IconMusic className="h-6 w-6" /> Score Analysis Results
+        <Music className="h-6 w-6" /> Score Analysis Results
       </h2>
 
       {isLoading ||
@@ -273,7 +273,7 @@ export default function AnalysisDisplay({
                           MusicXML
                         </div>
                         <div className="flex items-center gap-2">
-                          <IconFileMusic className="h-4 w-4 text-purple-700" />
+                          <FileMusic className="h-4 w-4 text-purple-700" />
                           <span className="text-sm font-semibold text-purple-900">
                             {musicXmlContent ? "Available" : "Not Available"}
                           </span>
@@ -323,7 +323,7 @@ export default function AnalysisDisplay({
                 ) : (
                   <div className="text-center py-8">
                     <div className="text-gray-400 mb-2">
-                      <IconMusic className="h-12 w-12 mx-auto" />
+                      <Music className="h-12 w-12 mx-auto" />
                     </div>
                     <p className="text-gray-500">
                       No analysis results available for this score.
@@ -338,7 +338,7 @@ export default function AnalysisDisplay({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <IconFileMusic className="h-5 w-5" />
+                  <FileMusic className="h-5 w-5" />
                   Sheet Music Viewer
                 </CardTitle>
                 {musicXmlContent && (
@@ -437,7 +437,7 @@ export default function AnalysisDisplay({
                 ) : (
                   <div className="text-center py-12">
                     <div className="text-gray-400 mb-4">
-                      <IconFileMusic className="h-16 w-16 mx-auto" />
+                      <FileMusic className="h-16 w-16 mx-auto" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                       No MusicXML Available
@@ -455,7 +455,7 @@ export default function AnalysisDisplay({
                           onClick={() => refetch()}
                           className="flex items-center gap-2"
                         >
-                          <IconRefresh className="h-4 w-4" />
+                          <RefreshCcw className="h-4 w-4" />
                           Check Again
                         </Button>
                       </div>
@@ -470,7 +470,7 @@ export default function AnalysisDisplay({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <IconBrain className="h-5 w-5" />
+                  <Brain className="h-5 w-5" />
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
@@ -489,10 +489,12 @@ export default function AnalysisDisplay({
                       this score.
                     </p>
                     <Button
-                      onClick={generateSummary}
+                      onClick={() => {
+                        if (data) generateSummary(data);
+                      }}
                       className="flex items-center gap-2"
                     >
-                      <IconSparkles className="h-4 w-4" />
+                      <Sparkles className="h-4 w-4" />
                       Generate AI Summary
                     </Button>
                   </div>
@@ -506,8 +508,13 @@ export default function AnalysisDisplay({
                     <Alert variant="destructive">
                       <AlertDescription>{summaryError}</AlertDescription>
                     </Alert>
-                    <Button onClick={generateSummary} variant="outline">
-                      <IconRefresh className="mr-2 h-4 w-4" /> Retry
+                    <Button
+                      onClick={() => {
+                        if (data) generateSummary(data);
+                      }}
+                      variant="outline"
+                    >
+                      <RefreshCcw className="mr-2 h-4 w-4" /> Retry
                     </Button>
                   </div>
                 ) : summary ? (
@@ -557,11 +564,13 @@ export default function AnalysisDisplay({
 
                     <div className="flex justify-end pt-4">
                       <Button
-                        onClick={generateSummary}
+                        onClick={() => {
+                          if (data) generateSummary(data);
+                        }}
                         variant="outline"
                         size="sm"
                       >
-                        <IconRefresh className="mr-2 h-4 w-4" /> Regenerate
+                        <RefreshCcw className="mr-2 h-4 w-4" /> Regenerate
                       </Button>
                     </div>
                   </div>
