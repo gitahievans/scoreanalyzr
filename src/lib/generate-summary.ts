@@ -1,6 +1,8 @@
-// lib/generate-summary.ts (client-side utility)
+// lib/generate-summary.ts
+import { runFlow } from "@genkit-ai/next/client";
+import { musicSummaryFlow } from "@/genkit/musicSummaryFlow";
 
-// Type definitions (extract these from your server code)
+// Keep your existing type definitions for backward compatibility
 export interface GenerateSummaryFromResultsInput {
   analysisResults: {
     key: string;
@@ -74,29 +76,18 @@ export async function generateSummaryFromResults(
   input: GenerateSummaryFromResultsInput
 ): Promise<GenerateSummaryFromResultsOutput> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const endpoint = apiUrl.endsWith("/")
-      ? `${apiUrl}api/generate-summary`
-      : `${apiUrl}/api/generate-summary`;
-
-    console.log("Making request to:", endpoint);
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    // Use GenKit's runFlow instead of direct fetch
+    const result = await runFlow<typeof musicSummaryFlow>({
+      url: "/api/generate-summary",
+      input: {
+        analysisResults: input.analysisResults,
+        scoreTitle: input.scoreTitle,
       },
-      body: JSON.stringify(input),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error calling generate summary API:", error);
+    console.error("Error calling GenKit music summary flow:", error);
     throw error;
   }
 }
