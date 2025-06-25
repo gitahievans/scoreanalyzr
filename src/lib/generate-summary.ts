@@ -1,8 +1,6 @@
-// lib/generate-summary.ts
 import { runFlow } from "@genkit-ai/next/client";
-import { musicSummaryFlow } from "@/genkit/musicSummaryFlow";
+import { summaryFlow } from "@/genkit/summaryFlow";
 
-// Keep your existing type definitions for backward compatibility
 export interface GenerateSummaryFromResultsInput {
   analysisResults: {
     key: string;
@@ -76,18 +74,18 @@ export async function generateSummaryFromResults(
   input: GenerateSummaryFromResultsInput
 ): Promise<GenerateSummaryFromResultsOutput> {
   try {
-    // Use GenKit's runFlow instead of direct fetch
-    const result = await runFlow<typeof musicSummaryFlow>({
-      url: "/api/generate-summary",
-      input: {
-        analysisResults: input.analysisResults,
-        scoreTitle: input.scoreTitle,
-      },
+    console.log(
+      "Calling summaryFlow with input:",
+      JSON.stringify(input, null, 2)
+    );
+    const result = await runFlow<typeof summaryFlow>({
+      url: "/api/summary",
+      input,
     });
 
     return result;
   } catch (error) {
-    console.error("Error calling GenKit music summary flow:", error);
+    console.error("Error calling summary flow:", error);
     throw error;
   }
 }
