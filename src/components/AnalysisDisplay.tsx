@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
-import { useScoreSummary } from "@/hooks/useScoreSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import OSMDComponent from "./OSMDComponent";
@@ -20,14 +19,6 @@ export default function AnalysisDisplay({
   onProcessingChange,
 }: AnalysisDisplayProps) {
   const { scoreData: data, isLoading, error, refetch } = useScoreData();
-  const {
-    summary,
-    isGenerating,
-    error: summaryError,
-    generateSummary,
-    canGenerate,
-    clearSummary,
-  } = useScoreSummary();
 
   // OSMD-related state
   const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
@@ -168,23 +159,6 @@ export default function AnalysisDisplay({
   };
 
   // Handle generate summary button click
-  const handleGenerateSummary = () => {
-    const summaryData = createSummaryData();
-    console.log("Generating summary with data:", summaryData);
-
-    if (summaryData) {
-      generateSummary(summaryData);
-    } else {
-      console.error("No valid data for summary generation");
-    }
-  };
-
-  // Handle summary errors with error boundary
-  // useEffect(() => {
-  //   if (summaryError) {
-  //     showBoundary(new Error(summaryError));
-  //   }
-  // }, [summaryError, showBoundary]);
 
   if (error) {
     return (
@@ -223,10 +197,6 @@ export default function AnalysisDisplay({
       </div>
     );
   }
-
-  // Check if summary generation is possible
-  const summaryData = createSummaryData();
-  const canGenerateSummary = summaryData ? canGenerate(summaryData) : false;
 
   return (
     <div className="space-y-6 p-4">
@@ -486,115 +456,30 @@ export default function AnalysisDisplay({
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {!canGenerateSummary ? (
-                  <Alert>
-                    <AlertDescription>
-                      Analysis results are required before generating an AI
-                      summary.
-                      {/* Debug info - remove in production */}
-                      <details className="mt-2 text-xs">
-                        <summary>Debug Info</summary>
-                        <pre>
-                          {JSON.stringify(
-                            {
-                              hasData: !!data,
-                              processed: data?.score?.processed,
-                              hasResults: !!data?.score?.results,
-                              taskState: data?.task_status?.state,
-                            },
-                            null,
-                            2
-                          )}
-                        </pre>
-                      </details>
-                    </AlertDescription>
-                  </Alert>
-                ) : !summary && !isGenerating ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">
-                      Generate an AI-powered musical analysis and summary of
-                      this score.
-                    </p>
-                    <Button
-                      onClick={handleGenerateSummary}
-                      className="flex items-center gap-2"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Generate AI Summary
-                    </Button>
-                  </div>
-                ) : isGenerating ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-2"></div>
-                    <p>Generating AI summary...</p>
-                  </div>
-                ) : summaryError ? (
-                  <div className="space-y-4">
-                    <Alert variant="destructive">
-                      <AlertDescription>{summaryError}</AlertDescription>
-                    </Alert>
-                    <Button onClick={handleGenerateSummary} variant="outline">
-                      <RefreshCcw className="mr-2 h-4 w-4" /> Retry
-                    </Button>
-                  </div>
-                ) : summary ? (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Summary</h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.summary}
-                      </p>
-                    </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Musical Characteristics
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.musicalCharacteristics}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Harmonic Analysis
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.harmonicAnalysis}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Structural Insights
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.structuralInsights}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Performance Notes
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {summary.performanceNotes}
-                      </p>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button
-                        onClick={handleGenerateSummary}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <RefreshCcw className="mr-2 h-4 w-4" /> Regenerate
-                      </Button>
-                    </div>
-                  </div>
-                ) : null}
-              </CardContent>
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">
+                  Generate an AI-powered musical analysis and summary of this
+                  score.
+                </p>
+                <Button
+                  // onClick={handleGenerateSummary}
+                  className="flex items-center gap-2"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Generate AI Summary
+                </Button>
+                /******content */
+                <div className="flex justify-end pt-4">
+                  <Button
+                    // onClick={handleGenerateSummary}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <RefreshCcw className="mr-2 h-4 w-4" /> Regenerate
+                  </Button>
+                </div>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>
