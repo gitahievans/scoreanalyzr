@@ -1,7 +1,8 @@
 {
   "/_not-found/page": "/_not-found",
+  "/api/generate-summary/route": "/api/generate-summary",
   "/favicon.ico/route": "/favicon.ico",
-  "/upload/page": "/upload",
+  "/notadb/page": "/notadb",
   "/page": "/",
-  "/notadb/page": "/notadb"
+  "/upload/page": "/upload"
 }

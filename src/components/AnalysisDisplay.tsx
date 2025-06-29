@@ -15,12 +15,86 @@ interface AnalysisDisplayProps {
   onProcessingChange: (isProcessing: boolean) => void;
 }
 
+const renderFormattedText = (text: string) => {
+  // Split text into paragraphs
+  const paragraphs = text.split("\n\n");
+
+  return paragraphs
+    .map((paragraph, pIndex) => {
+      if (!paragraph.trim()) return null;
+
+      // Process each paragraph for inline formatting
+      const processInlineFormatting = (text: string) => {
+        const parts = [];
+        let currentIndex = 0;
+
+        // Regular expression to match **bold**, ***italic***, and other patterns
+        const formatRegex = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*]+\*)/g;
+        let match;
+
+        while ((match = formatRegex.exec(text)) !== null) {
+          // Add text before the match
+          if (match.index > currentIndex) {
+            parts.push(text.slice(currentIndex, match.index));
+          }
+
+          const matchedText = match[0];
+          const content = matchedText.replace(/\*/g, "");
+
+          // Determine formatting based on number of asterisks
+          if (matchedText.startsWith("***")) {
+            parts.push(
+              <strong
+                key={`bold-${match.index}`}
+                className="font-bold text-gray-900"
+              >
+                {content}
+              </strong>
+            );
+          } else if (matchedText.startsWith("**")) {
+            parts.push(
+              <strong
+                key={`bold-${match.index}`}
+                className="font-semibold text-gray-800"
+              >
+                {content}
+              </strong>
+            );
+          } else if (matchedText.startsWith("*")) {
+            parts.push(
+              <em
+                key={`italic-${match.index}`}
+                className="italic text-gray-700"
+              >
+                {content}
+              </em>
+            );
+          }
+
+          currentIndex = match.index + matchedText.length;
+        }
+
+        // Add remaining text
+        if (currentIndex < text.length) {
+          parts.push(text.slice(currentIndex));
+        }
+
+        return parts.length > 0 ? parts : [text];
+      };
+
+      return (
+        <p key={pIndex} className="mb-4 text-gray-700 leading-relaxed">
+          {processInlineFormatting(paragraph)}
+        </p>
+      );
+    })
+    .filter(Boolean);
+};
+
 export default function AnalysisDisplay({
   onProcessingChange,
 }: AnalysisDisplayProps) {
   const { scoreData: data, isLoading, error, refetch } = useScoreData();
-
-  // OSMD-related state
   const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
   const [musicXmlError, setMusicXmlError] = useState<string | null>(null);
   const [renderOptions] = useState({
@@ -30,6 +104,9 @@ export default function AnalysisDisplay({
   });
   const [musicXmlContent, setMusicXmlContent] = useState<string | null>(null);
   const [fetchAttempts, setFetchAttempts] = useState(0);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   console.log("ScoreData from context:", data);
 
@@ -150,15 +227,53 @@ export default function AnalysisDisplay({
     return {
       score: {
         processed: data.score.processed,
-        // Map results to analysis_results for the hook
         analysis_results: data.score.results,
         title: data.score.title,
+        composer: data.score.composer,
       },
       task_status: data.task_status,
     };
   };
 
-  // Handle generate summary button click
+  const handleGenerateSummary = async () => {
+    // Check if we have a score ID
+    if (!data?.score?.id) {
+      setSummaryError("No score ID available for summary generation");
+      return;
+    }
+
+    setIsGeneratingSummary(true);
+    setSummaryError(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/generate-summary/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ score_id: data.score.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Check if the response has the expected structure
+      if (result.status === "success" && result.summary) {
+        setSummary(result.summary);
+      } else {
+        throw new Error("Invalid response format from server");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate summary";
+      setSummaryError(errorMessage);
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
 
   if (error) {
     return (
@@ -456,30 +571,60 @@ export default function AnalysisDisplay({
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
-
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">
-                  Generate an AI-powered musical analysis and summary of this
-                  score.
-                </p>
-                <Button
-                  // onClick={handleGenerateSummary}
-                  className="flex items-center gap-2"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Generate AI Summary
-                </Button>
-                /******content */
-                <div className="flex justify-end pt-4">
-                  <Button
-                    // onClick={handleGenerateSummary}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <RefreshCcw className="mr-2 h-4 w-4" /> Regenerate
-                  </Button>
-                </div>
-              </div>
+              <CardContent>
+                {summaryError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertDescription>{summaryError}</AlertDescription>
+                  </Alert>
+                )}
+                {isGeneratingSummary ? (
+                  <div className="flex items-center justify-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-3"></div>
+                    <p className="text-gray-600">Generating AI summary...</p>
+                  </div>
+                ) : summary ? (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+                      <div className="text-gray-800">
+                        {renderFormattedText(summary)}
+                      </div>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                      <Button
+                        onClick={handleGenerateSummary}
+                        variant="outline"
+                        size="sm"
+                        disabled={isGeneratingSummary}
+                        className="flex items-center gap-2 hover:bg-gray-50"
+                      >
+                        <RefreshCcw className="h-4 w-4" /> Regenerate Summary
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 mb-4">
+                      <Brain className="h-16 w-16 mx-auto opacity-50" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No AI Summary Yet
+                    </h3>
+                    <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                      Generate an AI-powered musical analysis and summary of
+                      this score to get insights about its style, structure, and
+                      characteristics.
+                    </p>
+                    <Button
+                      onClick={handleGenerateSummary}
+                      className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                      disabled={isGeneratingSummary || !data?.score?.id}
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Generate AI Summary
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>

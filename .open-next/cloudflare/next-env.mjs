@@ -1,3 +1,3 @@
-export const production = {"GOOGLE_GENAI_API_KEY":"AIzaSyDqlWrUf6tRISqyz0m6sVLJ_i9FNvZ6aic","NEXT_PUBLIC_API_URL":"https://api.notadb.xyz:8443"};
-export const development = {"GOOGLE_GENAI_API_KEY":"AIzaSyDqlWrUf6tRISqyz0m6sVLJ_i9FNvZ6aic","NEXT_PUBLIC_API_URL":"https://api.notadb.xyz:8443"};
-export const test = {"GOOGLE_GENAI_API_KEY":"AIzaSyDqlWrUf6tRISqyz0m6sVLJ_i9FNvZ6aic","NEXT_PUBLIC_API_URL":"https://api.notadb.xyz:8443"};
+export const production = {"NEXT_PUBLIC_API_URL":"http://127.0.0.1:8000","OPENAI_API_KEY":"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"};
+export const development = {"NEXT_PUBLIC_API_URL":"http://127.0.0.1:8000","OPENAI_API_KEY":"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"};
+export const test = {};

@@ -1,4 +1,3 @@
-var define_IMAGES_REMOTE_PATTERNS_default = [];
 import { AsyncLocalStorage } from "node:async_hooks";
 import process from "node:process";
 import stream from "node:stream";
@@ -50,7 +49,7 @@ function initRuntime() {
   };
   Object.assign(globalThis, {
     Request: CustomRequest,
-    __BUILD_TIMESTAMP_MS__: 1750477508758,
+    __BUILD_TIMESTAMP_MS__: 1751225250504,
     __NEXT_BASE_PATH__: "",
     // The external middleware will use the convertTo function of the `edge` converter
     // by default it will try to fetch the request, but since we are running everything in the same worker
@@ -79,70 +78,6 @@ function populateProcessEnv(url, env) {
   });
   process.env.__NEXT_PRIVATE_ORIGIN = url.origin;
 }
-const imgRemotePatterns = define_IMAGES_REMOTE_PATTERNS_default;
-function fetchImage(fetcher, url) {
-  if (!url || url.length > 3072 || url.startsWith("//")) {
-    return new Response("Not Found", { status: 404 });
-  }
-  if (url.startsWith("/")) {
-    if (/\/_next\/image($|\/)/.test(decodeURIComponent(parseUrl(url)?.pathname ?? ""))) {
-      return new Response("Not Found", { status: 404 });
-    }
-    return fetcher?.fetch(`http://assets.local${url}`);
-  }
-  let hrefParsed;
-  try {
-    hrefParsed = new URL(url);
-  } catch {
-    return new Response("Not Found", { status: 404 });
-  }
-  if (!["http:", "https:"].includes(hrefParsed.protocol)) {
-    return new Response("Not Found", { status: 404 });
-  }
-  if (!imgRemotePatterns.some((p) => matchRemotePattern(p, hrefParsed))) {
-    return new Response("Not Found", { status: 404 });
-  }
-  return fetch(url, { cf: { cacheEverything: true } });
-}
-function matchRemotePattern(pattern, url) {
-  if (pattern.protocol !== void 0) {
-    if (pattern.protocol.replace(/:$/, "") !== url.protocol.replace(/:$/, "")) {
-      return false;
-    }
-  }
-  if (pattern.port !== void 0) {
-    if (pattern.port !== url.port) {
-      return false;
-    }
-  }
-  if (pattern.hostname === void 0) {
-    throw new Error(`Pattern should define hostname but found
-${JSON.stringify(pattern)}`);
-  } else {
-    if (!new RegExp(pattern.hostname).test(url.hostname)) {
-      return false;
-    }
-  }
-  if (pattern.search !== void 0) {
-    if (pattern.search !== url.search) {
-      return false;
-    }
-  }
-  if (!new RegExp(pattern.pathname).test(url.pathname)) {
-    return false;
-  }
-  return true;
-}
-function parseUrl(url) {
-  let parsed = void 0;
-  try {
-    parsed = new URL(url, "http://n");
-  } catch {
-  }
-  return parsed;
-}
 export {
-  fetchImage,
-  matchRemotePattern,
   runWithCloudflareRequestContext
 };
