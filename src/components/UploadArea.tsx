@@ -3,7 +3,12 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
-import { IconFileText, IconUpload, IconX } from "@tabler/icons-react";
+import {
+  IconFileText,
+  IconUpload,
+  IconX,
+  IconPhoto,
+} from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +20,7 @@ interface UploadResponse {
 }
 
 interface FormData {
-  pdf_file: File | null;
+  file: File | null;
 }
 
 interface UploadAreaProps {
@@ -25,9 +30,9 @@ interface UploadAreaProps {
 
 const uploadScore = async (formData: FormData): Promise<UploadResponse> => {
   const payload = new FormData();
-  if (formData.pdf_file) {
-    payload.append("pdf_file", formData.pdf_file);
-    payload.append("title", formData.pdf_file.name || "Untitled Score");
+  if (formData.file) {
+    payload.append("file", formData.file);
+    payload.append("title", formData.file.name || "Untitled Score");
     payload.append("composer", "Anonymous");
     payload.append("analyze", "true");
   }
@@ -44,6 +49,29 @@ const uploadScore = async (formData: FormData): Promise<UploadResponse> => {
   }
   return response.json();
 };
+
+// Supported file types
+const SUPPORTED_FILE_TYPES = {
+  "application/pdf": "PDF",
+  "image/jpeg": "JPEG",
+  "image/jpg": "JPG",
+  "image/png": "PNG",
+  "image/gif": "GIF",
+  "image/bmp": "BMP",
+  "image/tiff": "TIFF",
+  "image/webp": "WebP",
+};
+
+const SUPPORTED_EXTENSIONS = [
+  ".pdf",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".bmp",
+  ".tiff",
+  ".webp",
+];
 
 export default function UploadArea({
   onUploadSuccess,
@@ -80,9 +108,25 @@ export default function UploadArea({
     },
   });
 
+  const isFileTypeSupported = (file: File): boolean => {
+    return Object.keys(SUPPORTED_FILE_TYPES).includes(file.type);
+  };
+
+  const getFileTypeDisplayName = (file: File): string => {
+    return (
+      SUPPORTED_FILE_TYPES[file.type as keyof typeof SUPPORTED_FILE_TYPES] ||
+      "Unknown"
+    );
+  };
+
+  const isImageFile = (file: File): boolean => {
+    return file.type.startsWith("image/");
+  };
+
   const validateFile = (file: File): boolean => {
-    if (file.type !== "application/pdf") {
-      setError("Only PDF files are allowed");
+    if (!isFileTypeSupported(file)) {
+      const supportedTypes = Object.values(SUPPORTED_FILE_TYPES).join(", ");
+      setError(`Only ${supportedTypes} files are allowed`);
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
@@ -104,16 +148,35 @@ export default function UploadArea({
     [isProcessing]
   );
 
+  const getFileIcon = (file: File) => {
+    return isImageFile(file) ? (
+      <IconPhoto size={24} className="text-orange-500" />
+    ) : (
+      <IconFileText size={24} className="text-orange-500" />
+    );
+  };
+
+  const getDropzoneIcon = () => {
+    if (files.length > 0) {
+      return isImageFile(files[0]) ? (
+        <IconPhoto size={52} className="text-orange-500" />
+      ) : (
+        <IconFileText size={52} className="text-orange-500" />
+      );
+    }
+    return <IconUpload size={52} className="text-gray-400" />;
+  };
+
   return (
     <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!isProcessing && files[0]) upload({ pdf_file: files[0] });
+          if (!isProcessing && files[0]) upload({ file: files[0] });
         }}
       >
         <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Upload PDF Music Score
+          Upload Music Score (PDF or Image)
         </Label>
         <div
           className={`border-2 border-dashed rounded-lg p-6 cursor-pointer
@@ -138,7 +201,7 @@ export default function UploadArea({
             if (isProcessing) return;
             const input = document.createElement("input");
             input.type = "file";
-            input.accept = ".pdf";
+            input.accept = SUPPORTED_EXTENSIONS.join(",");
             input.onchange = (e) => {
               const target = e.target as HTMLInputElement;
               if (target.files) handleDrop(Array.from(target.files));
@@ -147,20 +210,17 @@ export default function UploadArea({
           }}
         >
           <div className="flex flex-col items-center space-y-4">
-            {files.length ? (
-              <IconFileText size={52} className="text-orange-500" />
-            ) : (
-              <IconUpload size={52} className="text-gray-400" />
-            )}
+            {getDropzoneIcon()}
             <div className="text-center">
               <p className="text-xl">
                 {files.length
                   ? `${files.length} file selected`
-                  : "Drag a PDF file here or click to select"}
+                  : "Drag a PDF or image file here or click to select"}
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                Maximum file size: 5MB
+                Supported formats: PDF, JPEG, PNG, GIF, BMP, TIFF, WebP
               </p>
+              <p className="text-sm text-gray-500">Maximum file size: 5MB</p>
               {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
             </div>
           </div>
@@ -174,8 +234,14 @@ export default function UploadArea({
               >
                 <div className="flex items-center justify-between p-3">
                   <div className="flex items-center space-x-2">
-                    <IconFileText size={24} className="text-orange-500" />
-                    <span className="text-sm text-gray-600">{file.name}</span>
+                    {getFileIcon(file)}
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-600">{file.name}</span>
+                      <span className="text-xs text-gray-500">
+                        {getFileTypeDisplayName(file)} •{" "}
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"

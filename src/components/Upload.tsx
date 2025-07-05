@@ -37,7 +37,7 @@ const uploadScore = async (formData: FormDataType): Promise<UploadResponse> => {
   payload.append("composer", formData.composer || "Anonymous");
   payload.append("lyrics", formData.lyrics);
   if (formData.file) {
-    payload.append("pdf_file", formData.file);
+    payload.append("file", formData.file);
   }
   if (formData.year) {
     payload.append("year", formData.year.toString());

@@ -1,95 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import OSMDComponent from "./OSMDComponent";
-import { Brain, FileMusic, Music, RefreshCcw, Sparkles } from "lucide-react";
+import {
+  Brain,
+  FileMusic,
+  Music,
+  RefreshCcw,
+  Sparkles,
+  Download,
+} from "lucide-react";
+import { renderFormattedText } from "@/lib/renderText";
+import { Divider } from "@mantine/core";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface AnalysisDisplayProps {
   onProcessingChange: (isProcessing: boolean) => void;
 }
-
-const renderFormattedText = (text: string) => {
-  // Split text into paragraphs
-  const paragraphs = text.split("\n\n");
-
-  return paragraphs
-    .map((paragraph, pIndex) => {
-      if (!paragraph.trim()) return null;
-
-      // Process each paragraph for inline formatting
-      const processInlineFormatting = (text: string) => {
-        const parts = [];
-        let currentIndex = 0;
-
-        // Regular expression to match **bold**, ***italic***, and other patterns
-        const formatRegex = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*]+\*)/g;
-        let match;
-
-        while ((match = formatRegex.exec(text)) !== null) {
-          // Add text before the match
-          if (match.index > currentIndex) {
-            parts.push(text.slice(currentIndex, match.index));
-          }
-
-          const matchedText = match[0];
-          const content = matchedText.replace(/\*/g, "");
-
-          // Determine formatting based on number of asterisks
-          if (matchedText.startsWith("***")) {
-            parts.push(
-              <strong
-                key={`bold-${match.index}`}
-                className="font-bold text-gray-900"
-              >
-                {content}
-              </strong>
-            );
-          } else if (matchedText.startsWith("**")) {
-            parts.push(
-              <strong
-                key={`bold-${match.index}`}
-                className="font-semibold text-gray-800"
-              >
-                {content}
-              </strong>
-            );
-          } else if (matchedText.startsWith("*")) {
-            parts.push(
-              <em
-                key={`italic-${match.index}`}
-                className="italic text-gray-700"
-              >
-                {content}
-              </em>
-            );
-          }
-
-          currentIndex = match.index + matchedText.length;
-        }
-
-        // Add remaining text
-        if (currentIndex < text.length) {
-          parts.push(text.slice(currentIndex));
-        }
-
-        return parts.length > 0 ? parts : [text];
-      };
-
-      return (
-        <p key={pIndex} className="mb-4 text-gray-700 leading-relaxed">
-          {processInlineFormatting(paragraph)}
-        </p>
-      );
-    })
-    .filter(Boolean);
-};
 
 export default function AnalysisDisplay({
   onProcessingChange,
@@ -107,6 +40,12 @@ export default function AnalysisDisplay({
   const [summary, setSummary] = useState<string | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [cleanedText, setCleanedText] = useState<string | null>(null);
+
+  // MIDI data state (only for download)
+  const [midiData, setMidiData] = useState<ArrayBuffer | null>(null);
+  const [midiError, setMidiError] = useState<string | null>(null);
+  const [isLoadingMidi, setIsLoadingMidi] = useState(false);
 
   console.log("ScoreData from context:", data);
 
@@ -195,7 +134,48 @@ export default function AnalysisDisplay({
         }
       };
 
+      const fetchMidiData = async () => {
+        if (!data?.score?.midi_url) {
+          console.log("No MIDI URL available");
+          return;
+        }
+
+        setIsLoadingMidi(true);
+        setMidiError(null);
+
+        try {
+          console.log(
+            "Fetching MIDI from:",
+            `${API_URL}${data.score.midi_url}`
+          );
+
+          const response = await fetch(`${API_URL}${data.score.midi_url}`, {
+            method: "GET",
+            headers: {
+              Accept: "audio/midi, audio/x-midi, */*",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const arrayBuffer = await response.arrayBuffer();
+          console.log("MIDI data fetched, size:", arrayBuffer.byteLength);
+
+          setMidiData(arrayBuffer);
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Unknown error";
+          console.error("Failed to fetch MIDI:", errorMessage);
+          setMidiError(`Failed to fetch MIDI: ${errorMessage}`);
+        } finally {
+          setIsLoadingMidi(false);
+        }
+      };
+
       fetchMusicXml();
+      fetchMidiData();
     }
   }, [data?.score?.processed, data?.task_status?.state, fetchAttempts]);
 
@@ -217,22 +197,9 @@ export default function AnalysisDisplay({
     setFetchAttempts(0);
     setMusicXmlError(null);
     setMusicXmlContent(null);
+    setMidiError(null);
+    setMidiData(null);
     refetch();
-  };
-
-  // Create a properly structured data object for the summary generation
-  const createSummaryData = () => {
-    if (!data?.score?.results) return null;
-
-    return {
-      score: {
-        processed: data.score.processed,
-        analysis_results: data.score.results,
-        title: data.score.title,
-        composer: data.score.composer,
-      },
-      task_status: data.task_status,
-    };
   };
 
   const handleGenerateSummary = async () => {
@@ -261,8 +228,13 @@ export default function AnalysisDisplay({
       const result = await response.json();
 
       // Check if the response has the expected structure
-      if (result.status === "success" && result.summary) {
-        setSummary(result.summary);
+      if (result.status === "success") {
+        if (result.summary) {
+          setSummary(result.summary);
+        }
+        if (result.cleaned_text) {
+          setCleanedText(result.cleaned_text);
+        }
       } else {
         throw new Error("Invalid response format from server");
       }
@@ -273,6 +245,34 @@ export default function AnalysisDisplay({
     } finally {
       setIsGeneratingSummary(false);
     }
+  };
+
+  const handleDownloadMusicXml = () => {
+    if (!musicXmlContent) return;
+
+    const blob = new Blob([musicXmlContent], {
+      type: "application/xml",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "score.musicxml";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadMidi = () => {
+    if (!midiData) return;
+
+    const blob = new Blob([midiData], {
+      type: "audio/midi",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "score.mid";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (error) {
@@ -339,7 +339,6 @@ export default function AnalysisDisplay({
             <TabsTrigger value="musicxml">Sheet Music</TabsTrigger>
             <TabsTrigger value="summary">AI Summary</TabsTrigger>
           </TabsList>
-
           <TabsContent value="results">
             <Card>
               <CardHeader>
@@ -446,10 +445,36 @@ export default function AnalysisDisplay({
           <TabsContent value="musicxml">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileMusic className="h-5 w-5" />
-                  Sheet Music Viewer
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <FileMusic className="h-5 w-5" />
+                    Sheet Music Viewer
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    {musicXmlContent && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadMusicXml}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download XML
+                      </Button>
+                    )}
+                    {midiData && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadMidi}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download MIDI
+                      </Button>
+                    )}
+                  </div>
+                </div>
                 {musicXmlContent && (
                   <div className="text-sm text-gray-500">
                     Rendered from: {data?.score?.title || "Untitled Score"}
@@ -459,10 +484,29 @@ export default function AnalysisDisplay({
               <CardContent>
                 {musicXmlContent ? (
                   <div className="space-y-4">
+                    {isLoadingMidi && (
+                      <Alert>
+                        <AlertDescription className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                          Loading MIDI file...
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {midiError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>
+                          It was not possible to generate MIDI from the file you
+                          uploaded.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     {musicXmlError && (
                       <Alert variant="destructive">
                         <AlertDescription>
-                          Failed to load sheet music: {musicXmlError}
+                          It was not possible to generate MusicXML from the file
+                          you uploaded.
                         </AlertDescription>
                       </Alert>
                     )}
@@ -472,7 +516,8 @@ export default function AnalysisDisplay({
                         <AlertDescription>
                           <div className="flex items-center justify-between">
                             <span>
-                              Error loading sheet music: {musicXmlError}
+                              It was not possible to generate MusicXML from the
+                              file you uploaded.
                             </span>
                             <Button
                               variant="outline"
@@ -486,7 +531,6 @@ export default function AnalysisDisplay({
                         </AlertDescription>
                       </Alert>
                     )}
-
                     {musicXmlLoaded && !musicXmlError && (
                       <Alert>
                         <AlertDescription className="text-green-700">
@@ -510,25 +554,6 @@ export default function AnalysisDisplay({
 
                     <div className="flex justify-between items-center text-sm text-gray-500">
                       <div>Use mouse wheel to zoom, click and drag to pan</div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const blob = new Blob([musicXmlContent], {
-                              type: "application/xml",
-                            });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement("a");
-                            a.href = url;
-                            a.download = "score.musicxml";
-                            a.click();
-                            URL.revokeObjectURL(url);
-                          }}
-                        >
-                          Download MusicXML
-                        </Button>
-                      </div>
                     </div>
                   </div>
                 ) : (
@@ -587,6 +612,10 @@ export default function AnalysisDisplay({
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
                       <div className="text-gray-800">
                         {renderFormattedText(summary)}
+                      </div>
+                      <Divider className="my-4" />
+                      <div className="text-gray-800">
+                        {renderFormattedText(cleanedText || "")}
                       </div>
                     </div>
                     <div className="flex justify-end pt-2">
