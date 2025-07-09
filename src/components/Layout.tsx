@@ -13,7 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconFiles, IconHome2, IconUpload } from "@tabler/icons-react";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
-import logo from "@/assets/icon.png";
+import logo from "@/assets/icon2.png";
 import Image from "next/image";
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -61,18 +61,18 @@ export function Layout({ children }: { children: ReactNode }) {
         breakpoint: "sm",
         collapsed: { desktop: true, mobile: !opened },
       }}
-      padding="md"
+      padding="xs"
       className="bg-gray-50"
     >
       <AppShell.Header className="border-b border-gray-200 bg-orange-50">
         <div className="flex items-center justify-between h-full px-4">
           <Group gap={rem(8)} className="flex items-center">
-            <Image src={logo} alt="Logo" className="text-orange-600" />
+            <Image src={logo} alt="Logo" className="h-6 w-6" />
             <Link
               href="/"
               className="text-xl font-bold text-orange-600 no-underline"
             >
-              Nota DB
+              Notanalyzr
             </Link>
           </Group>
 
@@ -110,7 +110,7 @@ export function Layout({ children }: { children: ReactNode }) {
       </Drawer>
 
       <AppShell.Main className="bg-orange-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">{children}</div>
+        <div className="max-w-7xl mx-auto px-2">{children}</div>
       </AppShell.Main>
     </AppShell>
   );

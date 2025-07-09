@@ -17,7 +17,10 @@ import {
 } from "lucide-react";
 import { renderFormattedText } from "@/lib/renderText";
 import { Divider } from "@mantine/core";
-
+import AnalysisResults from "./AnalysisResults";
+import MusicTheoryLoader from "./MusicTheoryContent ";
+import * as Tone from "tone";
+import { Midi } from "@tonejs/midi";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface AnalysisDisplayProps {
@@ -30,11 +33,6 @@ export default function AnalysisDisplay({
   const { scoreData: data, isLoading, error, refetch } = useScoreData();
   const [musicXmlLoaded, setMusicXmlLoaded] = useState(false);
   const [musicXmlError, setMusicXmlError] = useState<string | null>(null);
-  const [renderOptions] = useState({
-    drawTitle: true,
-    drawComposer: true,
-    drawFingerings: false,
-  });
   const [musicXmlContent, setMusicXmlContent] = useState<string | null>(null);
   const [fetchAttempts, setFetchAttempts] = useState(0);
   const [summary, setSummary] = useState<string | null>(null);
@@ -47,7 +45,182 @@ export default function AnalysisDisplay({
   const [midiError, setMidiError] = useState<string | null>(null);
   const [isLoadingMidi, setIsLoadingMidi] = useState(false);
 
-  console.log("ScoreData from context:", data);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [midiPlayer, setMidiPlayer] = useState<any>(null);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
+  const [parsedMidi, setParsedMidi] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isMidiLoading, setIsMidiLoading] = useState(false); // New state for loading isLoading, setIsLoading] = useState(false);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (midiData && !parsedMidi) {
+      initializeMidiPlayer();
+    }
+  }, [midiData, parsedMidi]);
+
+  // Cleanup effect for progress tracking
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Add this function to initialize the MIDI player
+  const initializeMidiPlayer = async () => {
+    setIsMidiLoading(true);
+    try {
+      // Parse MIDI data using @tonejs/midi
+      const midi = new Midi(midiData!);
+      console.log("Parsed MIDI:", midi);
+
+      // Create a polyphonic synthesizer for better sound
+      const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+      setParsedMidi(midi);
+      setMidiPlayer({ synth, midi });
+      setDuration(midi.duration);
+      setPlaybackError(null);
+    } catch (error) {
+      console.error("Failed to initialize MIDI player:", error);
+      setPlaybackError("Failed to parse MIDI file");
+    } finally {
+      setIsMidiLoading(false);
+    }
+  };
+
+  // Helper function to format time as MM:SS
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // Helper function to start progress tracking
+  const startProgressTracking = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+
+    progressIntervalRef.current = setInterval(() => {
+      const transportTime = Tone.Transport.seconds;
+      setCurrentTime(transportTime);
+
+      // Auto-stop if we've reached the end
+      if (transportTime >= duration) {
+        stopPlayback();
+      }
+    }, 100); // Update every 100ms for smooth progress
+  };
+
+  // Helper function to stop progress tracking
+  const stopProgressTracking = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  };
+
+  // Helper function to stop playback
+  const stopPlayback = () => {
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+    stopProgressTracking();
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  // Add this function to handle seeking
+  const handleSeek = (newTime: number) => {
+    if (!midiPlayer || !parsedMidi) return;
+
+    const wasPlaying = isPlaying;
+
+    // Stop current playback
+    if (isPlaying) {
+      stopPlayback();
+    }
+
+    // Set new position
+    setCurrentTime(newTime);
+
+    // If was playing, restart from new position
+    if (wasPlaying) {
+      startPlaybackFromTime(newTime);
+    }
+  };
+
+  // Helper function to start playback from specific time
+  const startPlaybackFromTime = async (startTime: number = 0) => {
+    if (!midiPlayer || !parsedMidi) return;
+
+    try {
+      // Start audio context if suspended
+      if (Tone.context.state === "suspended") {
+        await Tone.start();
+      }
+
+      // Clear any existing scheduled events
+      Tone.Transport.cancel();
+
+      const { synth, midi } = midiPlayer;
+
+      // Schedule all MIDI events from the start time
+      midi.tracks.forEach((track: any) => {
+        track.notes.forEach((note: any) => {
+          if (note.time >= startTime) {
+            Tone.Transport.schedule((time: number) => {
+              synth.triggerAttackRelease(
+                note.name,
+                note.duration,
+                time,
+                note.velocity
+              );
+            }, note.time - startTime);
+          }
+        });
+      });
+
+      // Start transport and progress tracking
+      Tone.Transport.start();
+      startProgressTracking();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error("Playback error:", error);
+      setPlaybackError(
+        "Playback failed: " +
+          (error instanceof Error ? error.message : String(error))
+      );
+      setIsPlaying(false);
+    }
+  };
+
+  // Add this function to handle play/pause
+  const togglePlayback = async () => {
+    if (!midiPlayer || !parsedMidi) return;
+
+    if (isPlaying) {
+      stopPlayback();
+    } else {
+      await startPlaybackFromTime(currentTime);
+    }
+  };
+
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (data?.score?.processed || data?.task_status?.state === "FAILURE") {
@@ -298,12 +471,12 @@ export default function AnalysisDisplay({
 
   if (!isLoading && !data && !error) {
     return (
-      <div className="space-y-6 p-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
           <Music className="h-6 w-6" /> Score Analysis Results
         </h2>
         <Card>
-          <CardContent className="p-6 text-center">
+          <CardContent className="p-4 text-center">
             <p className="text-gray-500">
               Upload or select a score to see analysis results.
             </p>
@@ -314,120 +487,50 @@ export default function AnalysisDisplay({
   }
 
   return (
-    <div className="space-y-6 p-4">
-      <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
-        <Music className="h-6 w-6" /> Score Analysis Results
+    <div className="space-y-6 md:p-6 rounded-xl">
+      <h2 className="text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2 px-2 sm:px-0">
+        <Music className="h-5 w-5 sm:h-6 sm:w-6" />
+        <span className="hidden sm:inline">Score Analysis Results</span>
+        <span className="sm:hidden">Analysis Results</span>
       </h2>
 
       {isLoading ||
       (data &&
         !data.score?.processed &&
         data.task_status?.state === "PENDING") ? (
-        <Card>
-          <CardContent className="flex items-center justify-center p-6">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-2"></div>
-            <p>
-              {data?.task_status?.info ||
-                "Let the magic unfold, it might take a while..."}
-            </p>
-          </CardContent>
-        </Card>
+        <MusicTheoryLoader
+          message="Analyzing your music score with Audiveris..."
+          className="my-custom-classes"
+        />
       ) : (
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="results">Analysis Results</TabsTrigger>
-            <TabsTrigger value="musicxml">Sheet Music</TabsTrigger>
-            <TabsTrigger value="summary">AI Summary</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+            <TabsTrigger value="results" className="px-2 sm:px-4">
+              <span className="hidden sm:inline">Analysis Results</span>
+              <span className="sm:hidden">Results</span>
+            </TabsTrigger>
+            <TabsTrigger value="musicxml" className="px-2 sm:px-4">
+              <span className="hidden sm:inline">Sheet Music</span>
+              <span className="sm:hidden">Music</span>
+            </TabsTrigger>
+            <TabsTrigger value="summary" className="px-2 sm:px-4">
+              <span className="hidden sm:inline">AI Summary</span>
+              <span className="sm:hidden">Summary</span>
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="results">
             <Card>
               <CardHeader>
-                <CardTitle>{data?.score?.title || "No title"}</CardTitle>
+                <h1 className="text-2xl font-semibold">
+                  {data?.score?.title || "No title"}
+                </h1>
               </CardHeader>
               <CardContent>
                 {data?.score?.results ? (
-                  <div className="space-y-6">
-                    {/* Basic Information Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-                        <div className="text-sm font-medium text-blue-600 mb-1">
-                          Key Signature
-                        </div>
-                        <div className="text-lg font-bold text-blue-900">
-                          {data.score.results.key}
-                        </div>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                        <div className="text-sm font-medium text-green-600 mb-1">
-                          Time Signature
-                        </div>
-                        <div className="text-lg font-bold text-green-900">
-                          {data.score.results.time_signature}
-                        </div>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200">
-                        <div className="text-sm font-medium text-amber-600 mb-1">
-                          Parts
-                        </div>
-                        <div className="text-sm font-semibold text-amber-900">
-                          {data.score.results.parts?.join(", ")}
-                        </div>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                        <div className="text-sm font-medium text-purple-600 mb-1">
-                          MusicXML
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FileMusic className="h-4 w-4 text-purple-700" />
-                          <span className="text-sm font-semibold text-purple-900">
-                            {musicXmlContent ? "Available" : "Not Available"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Chord Progression Section */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          A few chords detected
-                        </h3>
-                      </div>
-
-                      {data.score.results.chords &&
-                      data.score.results.chords.length > 0 ? (
-                        <div className="bg-gray-50 p-4 rounded-lg border">
-                          <div className="flex flex-wrap gap-2">
-                            {data.score.results.chords.map((chord, index) => (
-                              <div
-                                key={index}
-                                className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                  chord.pitch ===
-                                  "Chord Symbol Cannot Be Identified"
-                                    ? "bg-red-100 text-red-700 border border-red-200"
-                                    : "bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200"
-                                }`}
-                              >
-                                <span className="font-semibold">
-                                  {chord.pitch}
-                                </span>
-                                <span className="ml-2 text-xs opacity-75">
-                                  @{chord.offset}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="bg-gray-50 p-4 rounded-lg border text-center text-gray-500">
-                          No chord progression detected
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <AnalysisResults
+                    results={data.score.results}
+                    musicXmlContent={musicXmlContent}
+                  />
                 ) : (
                   <div className="text-center py-8">
                     <div className="text-gray-400 mb-2">
@@ -445,38 +548,146 @@ export default function AnalysisDisplay({
           <TabsContent value="musicxml">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <CardTitle className="flex items-center gap-2">
                     <FileMusic className="h-5 w-5" />
                     Sheet Music Viewer
                   </CardTitle>
-                  <div className="flex gap-2">
-                    {musicXmlContent && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleDownloadMusicXml}
-                        className="flex items-center gap-1"
-                      >
-                        <Download className="h-4 w-4" />
-                        Download XML
-                      </Button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {/* MIDI Playback Controls */}
+                    {midiData && !midiError && (
+                      <div className="flex flex-col gap-2 w-full sm:w-auto">
+                        {/* Play/Pause and Time Display */}
+                        <div className="flex items-center gap-2 justify-between sm:justify-start">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant={isPlaying ? "default" : "outline"}
+                              size="sm"
+                              onClick={togglePlayback}
+                              disabled={!midiPlayer || isMidiLoading}
+                              className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9"
+                            >
+                              {isMidiLoading ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                                  <span className="hidden xs:inline">
+                                    Loading
+                                  </span>
+                                </>
+                              ) : isPlaying ? (
+                                <>
+                                  <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
+                                    <div className="h-2 w-2 bg-white rounded-sm"></div>
+                                  </div>
+                                  <span className="hidden xs:inline">
+                                    Pause
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
+                                    <div className="w-0 h-0 border-l-[6px] border-l-current border-y-[4px] border-y-transparent"></div>
+                                  </div>
+                                  <span className="hidden xs:inline">Play</span>
+                                </>
+                              )}
+                            </Button>
+
+                            {/* Stop Button */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                stopPlayback();
+                                setCurrentTime(0);
+                              }}
+                              disabled={!midiPlayer || isMidiLoading}
+                              className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9"
+                            >
+                              <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
+                                <div className="h-2 w-2 bg-current"></div>
+                              </div>
+                              <span className="hidden xs:inline">Stop</span>
+                            </Button>
+                          </div>
+
+                          {/* Time Display */}
+                          {parsedMidi && (
+                            <div className="text-xs sm:text-sm text-gray-600 font-mono">
+                              {formatTime(currentTime)} / {formatTime(duration)}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Progress Bar */}
+                        {parsedMidi && (
+                          <div className="flex items-center gap-2 w-full">
+                            <div className="flex-1 relative">
+                              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-orange-500 transition-all duration-100 ease-linear"
+                                  style={{
+                                    width: `${
+                                      duration > 0
+                                        ? (currentTime / duration) * 100
+                                        : 0
+                                    }%`,
+                                  }}
+                                ></div>
+                              </div>
+                              {/* Clickable overlay for seeking */}
+                              <button
+                                className="absolute inset-0 w-full h-full cursor-pointer hover:bg-black hover:bg-opacity-10 rounded-full"
+                                onClick={(e) => {
+                                  const rect =
+                                    e.currentTarget.getBoundingClientRect();
+                                  const x = e.clientX - rect.left;
+                                  const percentage = x / rect.width;
+                                  const newTime = percentage * duration;
+                                  handleSeek(
+                                    Math.max(0, Math.min(newTime, duration))
+                                  );
+                                }}
+                                disabled={!midiPlayer || isMidiLoading}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
-                    {midiData && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleDownloadMidi}
-                        className="flex items-center gap-1"
-                      >
-                        <Download className="h-4 w-4" />
-                        Download MIDI
-                      </Button>
-                    )}
+
+                    {/* Download Buttons */}
+                    <div className="flex gap-2">
+                      {musicXmlContent && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadMusicXml}
+                          className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9 w-full sm:w-auto"
+                        >
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden xs:inline">Download</span> XML
+                        </Button>
+                      )}
+                      {midiData && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadMidi}
+                          className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9 w-full sm:w-auto"
+                        >
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden xs:inline">
+                            Download
+                          </span>{" "}
+                          MIDI
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {musicXmlContent && (
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 mt-2">
                     Rendered from: {data?.score?.title || "Untitled Score"}
                   </div>
                 )}
@@ -502,6 +713,12 @@ export default function AnalysisDisplay({
                       </Alert>
                     )}
 
+                    {playbackError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{playbackError}</AlertDescription>
+                      </Alert>
+                    )}
+
                     {musicXmlError && (
                       <Alert variant="destructive">
                         <AlertDescription>
@@ -514,8 +731,8 @@ export default function AnalysisDisplay({
                     {musicXmlError && (
                       <Alert className="mb-4">
                         <AlertDescription>
-                          <div className="flex items-center justify-between">
-                            <span>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <span className="text-sm">
                               It was not possible to generate MusicXML from the
                               file you uploaded.
                             </span>
@@ -523,7 +740,7 @@ export default function AnalysisDisplay({
                               variant="outline"
                               size="sm"
                               onClick={retryFetch}
-                              className="ml-4"
+                              className="self-start sm:self-auto"
                             >
                               Retry
                             </Button>
@@ -531,40 +748,72 @@ export default function AnalysisDisplay({
                         </AlertDescription>
                       </Alert>
                     )}
+
                     {musicXmlLoaded && !musicXmlError && (
                       <Alert>
-                        <AlertDescription className="text-green-700">
+                        <AlertDescription className="text-green-700 text-sm">
                           Sheet music loaded successfully! You can scroll and
                           zoom to explore the notation.
+                          {midiData && !midiError && parsedMidi && (
+                            <span className="block mt-1">
+                              🎵 MIDI playback ready • Duration:{" "}
+                              {formatTime(duration)} •{" "}
+                              {parsedMidi.tracks.length} track(s)
+                            </span>
+                          )}
                         </AlertDescription>
                       </Alert>
                     )}
 
-                    <div className="w-full min-h-[600px] bg-white rounded-lg border border-gray-200">
-                      <OSMDComponent
-                        musicXML={musicXmlContent}
-                        showLoadingSpinner={true}
-                        onLoad={handleMusicLoad}
-                        onError={handleMusicError}
-                        renderingOptions={renderOptions}
-                        className="w-full h-full"
-                        height={600}
-                      />
-                    </div>
+                    {/* Responsive OSMD container */}
+                    <OSMDComponent
+                      musicXML={musicXmlContent}
+                      showLoadingSpinner={true}
+                      onLoad={handleMusicLoad}
+                      onError={handleMusicError}
+                      className="w-full h-full"
+                    />
 
-                    <div className="flex justify-between items-center text-sm text-gray-500">
-                      <div>Use mouse wheel to zoom, click and drag to pan</div>
+                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500 px-2">
+                      <div>
+                        <span className="hidden sm:inline">
+                          Use mouse wheel to zoom, click and drag to pan
+                        </span>
+                        <span className="sm:hidden">
+                          Pinch to zoom, drag to pan
+                        </span>
+                      </div>
+                      {midiData && !midiError && parsedMidi && (
+                        <div className="text-orange-600 flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                isPlaying
+                                  ? "bg-green-500 animate-pulse"
+                                  : "bg-gray-400"
+                              }`}
+                            ></div>
+                            <span className="hidden sm:inline">
+                              {isPlaying ? "Playing" : "Ready"} •{" "}
+                              {formatTime(duration)}
+                            </span>
+                            <span className="sm:hidden">
+                              {isPlaying ? "▶️" : "⏸️"} {formatTime(duration)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="text-center py-8 sm:py-12">
                     <div className="text-gray-400 mb-4">
-                      <FileMusic className="h-16 w-16 mx-auto" />
+                      <FileMusic className="h-12 w-12 sm:h-16 sm:w-16 mx-auto" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                       No MusicXML Available
                     </h3>
-                    <p className="text-gray-500 max-w-md mx-auto">
+                    <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto px-4">
                       The sheet music notation is not available for this score.
                       This could happen if the analysis is still processing or
                       if the original image couldn't be converted to MusicXML
@@ -576,6 +825,7 @@ export default function AnalysisDisplay({
                           variant="outline"
                           onClick={() => refetch()}
                           className="flex items-center gap-2"
+                          size="sm"
                         >
                           <RefreshCcw className="h-4 w-4" />
                           Check Again
@@ -631,7 +881,7 @@ export default function AnalysisDisplay({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="flex flex-col items-center text-center py-12">
                     <div className="text-gray-400 mb-4">
                       <Brain className="h-16 w-16 mx-auto opacity-50" />
                     </div>

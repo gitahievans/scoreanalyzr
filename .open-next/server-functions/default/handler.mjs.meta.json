@@ -3926,27 +3926,27 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/page_client-reference-manifest.js": {
-      "bytes": 232784,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
-      "bytes": 233057,
+      "bytes": 232827,
       "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/_not-found/page_client-reference-manifest.js": {
-      "bytes": 232870,
+      "bytes": 232913,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
+      "bytes": 233100,
       "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js": {
-      "bytes": 233062,
+      "bytes": 233105,
       "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.js": {
-      "bytes": 12425,
+      "bytes": 12472,
       "imports": [
         {
           "path": "fs",
@@ -3969,14 +3969,14 @@
           "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\upload\\page_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/_not-found/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\_not-found\\page_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\gitahi\\Development\\notalyzr-\\.open-next\\server-functions\\default\\.next\\server\\app\\upload\\page_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js",
@@ -4024,7 +4024,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/493.js": {
-      "bytes": 35160,
+      "bytes": 35186,
       "imports": [],
       "format": "cjs"
     },
@@ -4581,7 +4581,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/page.js": {
-      "bytes": 1203661,
+      "bytes": 1266811,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
@@ -4627,7 +4627,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/upload/page.js": {
-      "bytes": 11956,
+      "bytes": 11952,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
@@ -4673,7 +4673,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-      "bytes": 22204,
+      "bytes": 22197,
       "imports": [
         {
           "path": "path",
@@ -8138,19 +8138,19 @@
           "bytesInOutput": 590
         },
         ".open-next/server-functions/default/.next/server/app/page_client-reference-manifest.js": {
-          "bytesInOutput": 218276
-        },
-        ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
-          "bytesInOutput": 218557
+          "bytesInOutput": 218319
         },
         ".open-next/server-functions/default/.next/server/app/_not-found/page_client-reference-manifest.js": {
-          "bytesInOutput": 218374
+          "bytesInOutput": 218417
+        },
+        ".open-next/server-functions/default/.next/server/app/upload/page_client-reference-manifest.js": {
+          "bytesInOutput": 218600
         },
         ".open-next/server-functions/default/.next/server/app/notadb/page_client-reference-manifest.js": {
-          "bytesInOutput": 218562
+          "bytesInOutput": 218605
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.js": {
-          "bytesInOutput": 9208
+          "bytesInOutput": 9248
         },
         ".open-next/server-functions/default/node_modules/react/cjs/react-jsx-runtime.production.min.js": {
           "bytesInOutput": 773
@@ -8168,7 +8168,7 @@
           "bytesInOutput": 129654
         },
         ".open-next/server-functions/default/.next/server/chunks/493.js": {
-          "bytesInOutput": 35308
+          "bytesInOutput": 35334
         },
         ".open-next/server-functions/default/.next/server/chunks/548.js": {
           "bytesInOutput": 71652
@@ -8246,13 +8246,13 @@
           "bytesInOutput": 20093
         },
         ".open-next/server-functions/default/.next/server/app/page.js": {
-          "bytesInOutput": 1254688
+          "bytesInOutput": 1318561
         },
         ".open-next/server-functions/default/.next/server/app/upload/page.js": {
-          "bytesInOutput": 12262
+          "bytesInOutput": 12258
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-          "bytesInOutput": 19028
+          "bytesInOutput": 19021
         },
         ".open-next/server-functions/default/node_modules/next/dist/lib/interop-default.js": {
           "bytesInOutput": 363
@@ -8531,7 +8531,7 @@
           "bytesInOutput": 49942
         }
       },
-      "bytes": 8619339
+      "bytes": 8683439
     }
   }
 }

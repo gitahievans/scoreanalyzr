@@ -1,0 +1,1064 @@
+{
+  "musicTheoryContent": [
+    {
+      "id": "7b84f0cc-2559-4c41-9283-56e220560a4f",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "579f27ad-3908-4891-afee-565fb321b1b3",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Breaking the Rules: Parallel Fifths in Pop Music",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "7304ffbc-b92a-4a0d-a5f5-e07e23f6378d",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Modulating Without Moving: Pivot Chords in Action",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "be762b12-ac5c-496b-a8df-c68ef026b62e",
+      "type": "theory_story",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "tritone_devil",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "The Devil's Interval",
+      "content": "The tritone was once called 'diabolus in musica' (devil in music) and was banned by medieval churches due to its dissonant sound. Today, it's the foundation of jazz harmony and creates tension in film scores.",
+      "visual_description": "Staff notation showing a tritone interval",
+      "complexity": "beginner"
+    },
+    {
+      "id": "circle_fifths",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "The Circle of Fifths",
+      "content": "Imagine the Circle of Fifths as a clock face for music. Each step clockwise adds one sharp to the key signature, while counterclockwise adds flats. This isn't just theory—it's a roadmap for modulation. When Beethoven moves from C major to G major in his symphonies, he's literally moving one step around this circle.",
+      "visual_description": "Circular diagram showing the progression of keys",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "bach_fugue",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Bach's Mathematical Music",
+      "content": "Johann Sebastian Bach didn't just compose fugues—he architected them like a master engineer. In his Art of Fugue, he demonstrated that a simple four-note theme could be transformed through inversion, retrograde, and augmentation to create an entire musical universe. Each voice enters at precise intervals, following mathematical ratios that mirror the golden ratio found in nature. When you hear a Bach fugue, you're experiencing pure musical geometry in motion.",
+      "visual_description": "Timeline showing fugue subject entries across different voices",
+      "complexity": "advanced"
+    },
+    {
+      "id": "jazz_substitution",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Jazz's Secret Weapon",
+      "content": "The tritone substitution is jazz's magic trick. Instead of playing the expected dominant chord, jazz musicians substitute it with a chord a tritone away. This creates smoother bass lines and adds sophisticated color. It's why jazz harmonies sound so much richer than basic pop progressions.",
+      "visual_description": "Piano keyboard showing tritone substitution",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "polyrhythm_africa",
+      "type": "theory_story",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "When Rhythms Collide",
+      "content": "West African polyrhythms are like multiple conversations happening simultaneously, each with its own logic and flow. When enslaved Africans brought these complex rhythmic patterns to the Americas, they collided with European harmonic traditions to birth jazz, blues, and eventually rock. The next time you tap your foot to a syncopated beat, you're participating in a rhythmic revolution that spans continents and centuries.",
+      "visual_description": "Visual representation of overlapping rhythmic patterns",
+      "complexity": "advanced"
+    },
+    {
+      "id": "sonata_form",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Musical Architecture",
+      "content": "Sonata form is like a three-act play: exposition introduces the themes, development explores their dramatic potential, and recapitulation brings resolution. Mozart perfected this form, but Beethoven stretched it like taffy, creating movements that feel like epic journeys through emotional landscapes.",
+      "visual_description": "Architectural diagram showing sonata form structure",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "whole_tone_scale",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Floating on Air",
+      "content": "The whole tone scale has no leading tone, creating a floating, dreamlike quality. Debussy used it to paint musical impressions, making harmony feel weightless and ethereal. It's the sound of mystery and magic.",
+      "visual_description": "Piano keys highlighting whole tone scale pattern",
+      "complexity": "beginner"
+    },
+    {
+      "id": "metric_modulation",
+      "type": "theory_story",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Time Traveler's Paradox",
+      "content": "Metric modulation is time travel in music. A composer takes a rhythmic value—say, the triplet eighth note—and suddenly declares it's now the new beat. Your brain scrambles to adjust, creating a thrilling sense of temporal displacement. Elliott Carter mastered this technique, making listeners feel like they're experiencing multiple time streams simultaneously. It's rhythm's answer to harmonic modulation.",
+      "visual_description": "Timeline showing how note values transform across tempo changes",
+      "complexity": "advanced"
+    },
+    {
+      "id": "9755120e-a4d3-4dcd-896a-297bbdbe2790",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "beginner"
+    },
+    {
+      "id": "65f3547e-37f2-45f1-84ae-af9531ea8ea3",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "903ac729-4e5d-4743-8887-ead1333e601f",
+      "type": "theory_story",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "The Emotional Color of Minor Seventh Chords",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "36d10750-f68e-464c-9a41-902c8538cda9",
+      "type": "theory_story",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Breaking the Rules: Parallel Fifths in Pop Music",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "78dbf701-d559-43a5-8332-18e1f99cab0a",
+      "type": "theory_story",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "08c8176a-c928-437a-aa21-8adb328beaa5",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "37808ffb-69ff-443c-b3a6-35c48d5bfdfa",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "f6349c5b-84f4-480e-92fe-c3998e5dfe0d",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "beginner"
+    },
+    {
+      "id": "b352f111-a721-49bf-8fa9-11956294dea9",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Modulating Without Moving: Pivot Chords in Action",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "b3078179-59e5-4613-bf81-3b8cb2e24f58",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Modulating Without Moving: Pivot Chords in Action",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "advanced"
+    },
+    {
+      "id": "bba895f7-6823-4831-83b4-b8e1851d4fa4",
+      "type": "theory_story",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "c3d3dcaf-14fe-4058-b07f-2058a38db49f",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "The Emotional Color of Minor Seventh Chords",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "beginner"
+    },
+    {
+      "id": "df333c68-e2ff-4040-8fc7-1d9ad412c713",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Breaking the Rules: Parallel Fifths in Pop Music",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "052162ed-543b-47d6-8045-1b686efd51f3",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "2ccdfded-52e8-4916-b665-5e5ef9c47847",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "The Emotional Color of Minor Seventh Chords",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "5fea550c-00be-45ad-9f3c-6bb16260c6fb",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Jazz Harmony: Navigating ii-V-I Progressions",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "9cc42b4f-c1fd-4bd8-b2e6-beebbfc70035",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Breaking the Rules: Parallel Fifths in Pop Music",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "002adef9-e52b-4e19-9715-b7d1bbe6200f",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "The Emotional Color of Minor Seventh Chords",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "32f53895-b7fa-42d8-bd99-5d6f084770a9",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "8758c7c1-7cce-4461-b1d0-1a73d5b9da65",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "9dfff10e-9811-4d85-9933-f2edda50f31e",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Jazz musicians often use the ii-V-I progression to create smooth harmonic motion. In C major, that\u2019s Dm7 - G7 - Cmaj7. The voice leading between these chords creates a pleasing sense of direction and sophistication.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "beginner"
+    },
+    {
+      "id": "d66ba51e-f223-4b82-8124-cf7b58310194",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "20-30",
+      "title": "Breaking the Rules: Parallel Fifths in Pop Music",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "38f08b75-87a9-4a75-95ef-654fb9342535",
+      "type": "mini_lesson",
+      "category": "harmony",
+      "duration": "10-15",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "Ever notice how the V7 chord seems to demand resolution? That's because it's packed with tension: the tritone between its third and seventh creates a strong pull toward the tonic. This is voice leading in action: each note wants to resolve by step, creating a feeling of closure.",
+      "visual_description": "Staff with a V7 chord resolving to I, voice-leading arrows shown",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "892470e0-8635-4a60-afdd-297c30bfbe5a",
+      "type": "quick_fact",
+      "category": "harmony",
+      "duration": "30-45",
+      "title": "Why the V7 Chord Feels So Resolute",
+      "content": "The circle of fifths isn't just for memorizing key signatures. It's a powerful tool for understanding relationships between keys and modulating smoothly in compositions. Try modulating from C to G \u2013 you'll find just one sharp in the way!",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "f22c55c9-ce78-45ab-a9e2-28dabea40fc7",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "608bc3df-4dbb-4664-b118-9189773e45d3",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Musical Palindromes and Their Structure",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "944f8e35-b320-4de6-b175-1b10ba513d39",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Mapping a Sonata: Exposition to Recap",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "beginner"
+    },
+    {
+      "id": "c08be6af-476c-49b9-8d27-c123d896906a",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "20-30",
+      "title": "AABA Form in Jazz Standards",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "180c6bca-adff-4d22-a93b-e73d3f8c0e53",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Fugue Construction 101",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "beginner"
+    },
+    {
+      "id": "7e86d59b-5b4b-4f89-b7b6-3242074f0ccf",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "30-45",
+      "title": "AABA Form in Jazz Standards",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "789fcec7-b284-4f81-bd0c-42f4204c44fb",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "bbe00690-5788-44ab-93bb-470ad99ca2e2",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "10-15",
+      "title": "Musical Palindromes and Their Structure",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "92618b7d-5ca6-40ff-8d89-2ea38e15a647",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "AABA Form in Jazz Standards",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "142b4463-406d-4ea4-a040-f23b29a91490",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "10-15",
+      "title": "AABA Form in Jazz Standards",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "50523aef-51f7-423a-92e1-915a4e4b6767",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "e7936415-fc19-4812-95f7-654269a96da6",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "10-15",
+      "title": "Mapping a Sonata: Exposition to Recap",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "beginner"
+    },
+    {
+      "id": "6a5cad6a-e79d-4df0-94b1-d8d64ca4dab6",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Fugue Construction 101",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "beginner"
+    },
+    {
+      "id": "f30d33b2-2f08-47b4-8f22-f36d40e7ba06",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "ded2ff46-cbc6-40a2-925b-f4873dc4a213",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Fugue Construction 101",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "beginner"
+    },
+    {
+      "id": "1ecf5e8c-fd3e-43cb-8ac7-1255d73e708a",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Mapping a Sonata: Exposition to Recap",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "2a7955d1-a10a-4225-9ccc-a56f02f107dc",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "20-30",
+      "title": "Fugue Construction 101",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "bf00ca06-477d-4717-ab74-089f920c629f",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "20-30",
+      "title": "AABA Form in Jazz Standards",
+      "content": "Sonata form is like a musical story: it starts with an exposition (main themes), journeys through a development (harmonic exploration), and returns in the recapitulation. Think of Mozart\u2019s piano sonatas \u2013 they follow this blueprint masterfully.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "4ea0d6d5-5448-4375-81b2-f8cbba32ffaf",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "10-15",
+      "title": "AABA Form in Jazz Standards",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "deb8e7b1-0a56-4918-8b50-7dd0ff3cf8f7",
+      "type": "quick_fact",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "94e0d5a8-25ba-4151-bd03-4d874a8e02a8",
+      "type": "theory_story",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "Sonata form diagram: exposition, development, recapitulation timeline",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "69db9dba-b3a5-49ab-aafd-f2fcfcb57dc1",
+      "type": "mini_lesson",
+      "category": "form",
+      "duration": "30-45",
+      "title": "Theme and Variations: Mozart vs. Brahms",
+      "content": "In a fugue, the subject enters in one voice and is answered in another, creating a layered texture. Bach\u2019s fugues often introduce the subject in the tonic, then follow with an answer in the dominant \u2013 a hallmark of contrapuntal design.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "c43770d4-51c9-42a3-a743-59e4b5bd088f",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "20-30",
+      "title": "Syncopation: The Groove-Maker",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "Illustration of 5/4 time signature with beat groupings",
+      "complexity": "beginner"
+    },
+    {
+      "id": "142af9a2-c81b-4337-bac6-0c1c98f8a6a0",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "4bd496c0-78a1-4e3c-b23c-1b410a68d2d0",
+      "type": "theory_story",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "Polyrhythm vs. Polymeter",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "7d2447b5-26c4-481d-b228-bd71953f8720",
+      "type": "theory_story",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "What is Hemiola? A Rhythmic Illusion",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "Illustration of 5/4 time signature with beat groupings",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "af823f9b-272a-405f-bdee-383b34c3b9e3",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "Why 12/8 Feels Like a Dance",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "eda754e0-8f92-4bc7-831c-27e93e32b9d3",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Why 12/8 Feels Like a Dance",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "b5867271-bba4-4a2f-a9f2-ff01a93dfb60",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "20-30",
+      "title": "Why 12/8 Feels Like a Dance",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "bbc3c8e0-6f4f-4f41-a40a-59a129183871",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "20-30",
+      "title": "What is Hemiola? A Rhythmic Illusion",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "00046424-b9e9-4b38-876f-426c8ebdf3ec",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "20-30",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "5d3803d1-2f49-4326-8c22-bee5b3367dfa",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Syncopation: The Groove-Maker",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "131e6255-96e0-4385-befc-f9c8e21f0f81",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "89bb726e-eba6-433c-8c3a-f85b23dcc3ec",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "What is Hemiola? A Rhythmic Illusion",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "80171342-d48a-493d-a107-fb86f2190a2b",
+      "type": "quick_fact",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Syncopation: The Groove-Maker",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "Illustration of 5/4 time signature with beat groupings",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "3ca73b98-8ca3-48f7-872d-a5c4d4387ddf",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "Illustration of 5/4 time signature with beat groupings",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "eb6b614e-d16b-4e7c-b73a-2e0d611d8107",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "20-30",
+      "title": "Polyrhythm vs. Polymeter",
+      "content": "Syncopation occurs when emphasis is placed on weak beats or offbeats, creating a sense of surprise. Listen to ragtime or Afro-Cuban music for some of the most iconic examples!",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "bca714c9-d64f-4fb5-9276-1bef0a6a509f",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "What is Hemiola? A Rhythmic Illusion",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "Illustration of 5/4 time signature with beat groupings",
+      "complexity": "beginner"
+    },
+    {
+      "id": "adeb6b87-4965-445c-a349-679753f48c9b",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "10-15",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "4c08c87e-54bf-42cb-b0d2-aa7f7193702f",
+      "type": "mini_lesson",
+      "category": "rhythm",
+      "duration": "30-45",
+      "title": "Feeling Five: The Quirks of 5/4 Time",
+      "content": "In 5/4 time, the beat can be grouped as 3+2 or 2+3 \u2013 each subdivision feels different. Dave Brubeck\u2019s 'Take Five' plays with this asymmetry to create its signature groove.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "48da0a45-54c7-40c5-8386-19c18672490a",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "20-30",
+      "title": "Why Medieval Music Was Modal",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "6854268e-a51e-4f32-b36c-3d850358af8a",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "20-30",
+      "title": "Raga and Tala: Indian Music Theory Fundamentals",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "1ae15adf-6425-4a2c-8121-a4777e2bbd32",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Raga and Tala: Indian Music Theory Fundamentals",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "48f8b2e6-148c-4b89-849f-55023bd42a83",
+      "type": "mini_lesson",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Why Medieval Music Was Modal",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "018119e9-4bbc-41fe-bc14-d7808f5269ba",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "20-30",
+      "title": "Why Medieval Music Was Modal",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "0408b7ec-3ff5-4f2c-bf8a-33e41e8fb485",
+      "type": "mini_lesson",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Arnold Schoenberg and the 12-Tone Revolution",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "c8b7f8b9-7dec-4f7a-b142-8093d8714523",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "30-45",
+      "title": "The Rise of Tonality in the Baroque Era",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "Timeline showing evolution from modes to tonal harmony",
+      "complexity": "beginner"
+    },
+    {
+      "id": "edc4aa24-e98b-4e5d-9f95-a3877c6f3b01",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Raga and Tala: Indian Music Theory Fundamentals",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "c942599c-9333-4788-991e-ea8cb213b3e8",
+      "type": "mini_lesson",
+      "category": "history",
+      "duration": "20-30",
+      "title": "The Rise of Tonality in the Baroque Era",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "deec25e2-b527-4e56-9e80-d52fa649e12f",
+      "type": "mini_lesson",
+      "category": "history",
+      "duration": "10-15",
+      "title": "The Rise of Tonality in the Baroque Era",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "Timeline showing evolution from modes to tonal harmony",
+      "complexity": "beginner"
+    },
+    {
+      "id": "cb6dba2c-5124-45b6-92b4-bbefa7100d33",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Heinrich Schenker: Redefining Analysis",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "Timeline showing evolution from modes to tonal harmony",
+      "complexity": "beginner"
+    },
+    {
+      "id": "0c98fb11-90a2-47df-8b2d-4678d15405b2",
+      "type": "theory_story",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Raga and Tala: Indian Music Theory Fundamentals",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "5df72886-d823-4780-875e-1a5eed2ebcf3",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "20-30",
+      "title": "The Rise of Tonality in the Baroque Era",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "fadd2ebb-532c-43b7-b3ed-993b2281fabe",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "20-30",
+      "title": "Raga and Tala: Indian Music Theory Fundamentals",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "Timeline showing evolution from modes to tonal harmony",
+      "complexity": "beginner"
+    },
+    {
+      "id": "b4f4ca89-3c90-435c-9b4f-086ea0339b25",
+      "type": "mini_lesson",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Why Medieval Music Was Modal",
+      "content": "Indian classical music doesn\u2019t use chords but instead relies on melodic frameworks called ragas and rhythmic cycles called talas. These concepts are centuries old and deeply sophisticated.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "7214cbf8-1146-46b1-9bcb-208de2b94362",
+      "type": "quick_fact",
+      "category": "history",
+      "duration": "30-45",
+      "title": "Heinrich Schenker: Redefining Analysis",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "b8685bf0-c4eb-4bbe-86db-27968312d828",
+      "type": "theory_story",
+      "category": "history",
+      "duration": "20-30",
+      "title": "Why Medieval Music Was Modal",
+      "content": "In the medieval era, music was based on modes, not major and minor scales. The Dorian mode, for example, sounds like a minor scale with a raised sixth \u2013 listen to Gregorian chant for a taste.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "b18a5f6a-6017-4aaf-87ba-4627dab20f89",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "20-30",
+      "title": "Cadences: More Than Just Endings",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "51e21b09-11de-45c5-b466-3dc05d2212cc",
+      "type": "theory_story",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Motivic Development in Beethoven's Fifth",
+      "content": "Roman numeral analysis assigns chords to scale degrees: I, IV, V, etc. In C major, C is I, F is IV, and G is V. This helps identify functional relationships between chords.",
+      "visual_description": "",
+      "complexity": "beginner"
+    },
+    {
+      "id": "8bc498fe-f19c-4790-831a-3e9c163a98bb",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "20-30",
+      "title": "Schenkerian Analysis: Seeing the Background",
+      "content": "Roman numeral analysis assigns chords to scale degrees: I, IV, V, etc. In C major, C is I, F is IV, and G is V. This helps identify functional relationships between chords.",
+      "visual_description": "Roman numeral chart over a short chord progression in C major",
+      "complexity": "advanced"
+    },
+    {
+      "id": "edc5865f-abcc-4e80-b6c9-b14bcc7b4c62",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "30-45",
+      "title": "Schenkerian Analysis: Seeing the Background",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "2e50962b-1e61-4a72-8b4c-3ead2403a73e",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "20-30",
+      "title": "Cadences: More Than Just Endings",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "9a5e94ed-3221-447c-98f0-c8a458a0656e",
+      "type": "quick_fact",
+      "category": "analysis",
+      "duration": "30-45",
+      "title": "Motivic Development in Beethoven's Fifth",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "Roman numeral chart over a short chord progression in C major",
+      "complexity": "beginner"
+    },
+    {
+      "id": "39cede34-ea04-4792-9080-d626695b3528",
+      "type": "quick_fact",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Motivic Development in Beethoven's Fifth",
+      "content": "Roman numeral analysis assigns chords to scale degrees: I, IV, V, etc. In C major, C is I, F is IV, and G is V. This helps identify functional relationships between chords.",
+      "visual_description": "Roman numeral chart over a short chord progression in C major",
+      "complexity": "beginner"
+    },
+    {
+      "id": "ac6b2a51-da36-4d32-968e-3c78e2c62c2a",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Understanding Harmonic Rhythm",
+      "content": "Roman numeral analysis assigns chords to scale degrees: I, IV, V, etc. In C major, C is I, F is IV, and G is V. This helps identify functional relationships between chords.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "4f8be3a9-b2e5-47ec-9fc9-1a1fa3af9020",
+      "type": "theory_story",
+      "category": "analysis",
+      "duration": "30-45",
+      "title": "Cadences: More Than Just Endings",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "327abe3d-9c62-4b1e-9e23-84ee2c286fb4",
+      "type": "quick_fact",
+      "category": "analysis",
+      "duration": "30-45",
+      "title": "Motivic Development in Beethoven's Fifth",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "98f1b3eb-47c8-475a-85b2-8ed5a2e5d745",
+      "type": "quick_fact",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Roman Numeral Analysis: A Crash Course",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "intermediate"
+    },
+    {
+      "id": "b24f7ab4-ebaa-46f6-a8eb-341d5e655531",
+      "type": "quick_fact",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Understanding Harmonic Rhythm",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "",
+      "complexity": "advanced"
+    },
+    {
+      "id": "22eea19d-e7bf-45dd-bc35-d3348e33e535",
+      "type": "mini_lesson",
+      "category": "analysis",
+      "duration": "10-15",
+      "title": "Cadences: More Than Just Endings",
+      "content": "Harmonic rhythm refers to how frequently chords change. A slow harmonic rhythm might mean one chord per measure; faster changes create drive and intensity, like in dance music.",
+      "visual_description": "Roman numeral chart over a short chord progression in C major",
+      "complexity": "intermediate"
+    }
+  ]
+}

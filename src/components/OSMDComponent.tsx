@@ -27,25 +27,27 @@ interface OSMDComponentProps {
     drawFingerings?: boolean;
     // Page format (e.g., 'A4_P' for A4 Portrait)
     pageFormat?: string;
+    // Base zoom level (0.5 = small like mobile, 1.0 = normal size)
+    baseZoom?: number;
   };
 }
 
 // Loading spinner component
 const LoadingSpinner: React.FC = () => (
   <div className="flex items-center justify-center p-8">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    <span className="ml-3 text-gray-600">Loading sheet music...</span>
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <span className="ml-3 text-muted-foreground">Loading sheet music...</span>
   </div>
 );
 
 // Error display component
 const ErrorDisplay: React.FC<{ message: string }> = ({ message }) => (
-  <div className="flex items-center justify-center p-8 bg-red-50 border border-red-200 rounded-lg">
+  <div className="flex items-center justify-center p-8 bg-destructive/10 border border-destructive/20 rounded-lg">
     <div className="text-center">
-      <div className="text-red-600 text-lg font-semibold mb-2">
+      <div className="text-destructive text-lg font-semibold mb-2">
         Error Loading Sheet Music
       </div>
-      <div className="text-red-500 text-sm">{message}</div>
+      <div className="text-destructive/80 text-sm">{message}</div>
     </div>
   </div>
 );
@@ -64,12 +66,127 @@ const OSMDComponent: React.FC<OSMDComponentProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   // Ref to store the OSMD instance
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+  // Ref to store resize observer
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // Component state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [containerDimensions, setContainerDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
-  // Function to load and render MusicXML - simplified like the working MusicRenderer
+  // Get responsive rendering options based on container width
+  const getResponsiveOptions = useCallback(
+    (containerWidth: number) => {
+      const isMobile = containerWidth < 768;
+      const isTablet = containerWidth >= 768 && containerWidth < 1024;
+      const isDesktop = containerWidth >= 1024;
+
+      // Base options with consistent compact sizing
+      const options = {
+        autoResize: true,
+        backend: "svg" as const,
+        drawTitle: renderingOptions.drawTitle ?? true,
+        drawComposer: renderingOptions.drawComposer ?? true,
+        drawFingerings: renderingOptions.drawFingerings ?? false,
+        drawCredits: false,
+        drawPartNames: !isMobile, // Hide part names on mobile to save space
+        followCursor: false,
+        defaultColorMusic: "#1f1f1f",
+
+        // Use consistent page format - landscape gives more horizontal space
+        pageFormat: renderingOptions.pageFormat || "",
+
+        // Key change: Use consistent compact spacing across all screen sizes
+        spacingFactorSoftmax: 0.7, // Smaller value = more compact spacing
+
+        // Consistent measure spacing
+        measureSpacing: 0.8,
+        staffSpacing: 0.8,
+        systemSpacing: 0.8,
+
+        // Auto-resize settings
+        autoResizeEnabled: true,
+
+        // Remove the problematic responsive zoom - use consistent baseZoom instead
+        // This was the main issue causing different sizes on different screens
+
+        // Auto-beam options for cleaner look
+        autoBeam: true,
+
+        // Layout options
+        pageBackgroundColor: "#ffffff",
+        renderSingleHorizontalStaffline: false,
+
+        // Compact note spacing
+        notesSpacing: 0.8,
+
+        // Reduce margins for more compact display
+        pageTopMargin: 10,
+        pageBottomMargin: 10,
+        pageLeftMargin: 10,
+        pageRightMargin: 10,
+
+        // System and staff distances
+        systemLeftMargin: 5,
+        systemRightMargin: 5,
+        staffDistance: 60, // Reduced from default
+        systemDistance: 80, // Reduced from default
+      };
+
+      return options;
+    },
+    [renderingOptions]
+  );
+
+  // Optimized resize handler with better performance
+  const handleResize = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      let isScrolling = false;
+
+      // Detect scrolling to avoid expensive re-renders during scroll
+      const handleScroll = () => {
+        isScrolling = true;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          isScrolling = false;
+        }, 150);
+      };
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+
+      return () => {
+        clearTimeout(timeoutId);
+
+        // Only re-render if not currently scrolling and size changed significantly
+        if (!isScrolling && containerRef.current && musicXML) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const currentWidth = containerDimensions.width;
+          const currentHeight = containerDimensions.height;
+
+          // Only re-render if size changed by more than 50px to avoid micro-adjustments
+          const widthDiff = Math.abs(rect.width - currentWidth);
+          const heightDiff = Math.abs(rect.height - currentHeight);
+
+          if (widthDiff > 50 || heightDiff > 50) {
+            timeoutId = setTimeout(() => {
+              setContainerDimensions({
+                width: rect.width,
+                height: rect.height,
+              });
+              renderMusic();
+            }, 500);
+          }
+        }
+      };
+    })(),
+    [musicXML, containerDimensions.width, containerDimensions.height]
+  );
+
+  // Function to load and render MusicXML with responsive options
   const renderMusic = useCallback(async () => {
     if (!containerRef.current || !musicXML) return;
 
@@ -77,32 +194,53 @@ const OSMDComponent: React.FC<OSMDComponentProps> = ({
     setError(null);
 
     try {
-      // Clear the container first - this is crucial!
+      // Get container dimensions
+      const rect = containerRef.current.getBoundingClientRect();
+      const containerWidth = rect.width || width || 800;
+      const containerHeight = rect.height || height || 600;
+
+      // Clear the container first
       containerRef.current.innerHTML = "";
 
-      // Create new OSMD instance each time - this prevents many issues
-      osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
-        // Basic rendering options
-        autoResize: true,
-        backend: "svg", // Use SVG backend for better quality
-        drawTitle: renderingOptions.drawTitle ?? true,
-        drawComposer: renderingOptions.drawComposer ?? true,
-        drawFingerings: renderingOptions.drawFingerings ?? false,
-        drawCredits: false,
-        drawPartNames: true,
-        followCursor: false,
-        defaultColorMusic: "#1f1f1f",
-        // Page formatting
-        pageFormat: renderingOptions.pageFormat || "A4_P",
-      });
+      // Get responsive options based on current container size
+      const responsiveOptions = {
+        ...getResponsiveOptions(containerWidth),
+        // Disable auto-resize during initial render for better performance
+        autoResize: false,
+        autoResizeEnabled: false,
+      };
 
-      // Load the MusicXML into OSMD - directly use the musicXML content
+      // Create new OSMD instance with responsive options
+      osmdRef.current = new OpenSheetMusicDisplay(
+        containerRef.current,
+        responsiveOptions
+      );
+
+      // Load the MusicXML into OSMD
       await osmdRef.current.load(musicXML);
+
+      // KEY FIX: Set consistent zoom based on desired compact appearance
+      // Use the baseZoom from renderingOptions, or default to a compact size
+      const baseZoom = renderingOptions.baseZoom ?? 0.65; // Default to compact size
+
+      // Only adjust zoom slightly based on screen size, not dramatically
+      const isMobile = containerWidth < 768;
+      const zoomAdjustment = isMobile ? 0.9 : 1.0; // Slight adjustment for mobile
+
+      osmdRef.current.zoom = baseZoom * zoomAdjustment;
 
       // Render the sheet music
       osmdRef.current.render();
 
-      console.log("MusicXML rendered successfully");
+      // Update container dimensions state
+      setContainerDimensions({
+        width: containerWidth,
+        height: containerHeight,
+      });
+
+      console.log(
+        `MusicXML rendered successfully at ${containerWidth}x${containerHeight} with zoom ${osmdRef.current.zoom}`
+      );
       setIsLoading(false);
 
       // Call success callback
@@ -117,12 +255,36 @@ const OSMDComponent: React.FC<OSMDComponentProps> = ({
       // Call error callback
       onError?.(errorMessage);
     }
-  }, [musicXML, renderingOptions, onLoad, onError]);
+  }, [
+    musicXML,
+    width,
+    height,
+    getResponsiveOptions,
+    onLoad,
+    onError,
+    renderingOptions.baseZoom,
+  ]);
+
+  // Setup resize observer for responsive behavior
+  useEffect(() => {
+    if (containerRef.current) {
+      resizeObserverRef.current = new ResizeObserver(handleResize);
+      resizeObserverRef.current.observe(containerRef.current);
+    }
+
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, [handleResize]);
 
   // Effect to render music when component mounts or musicXML changes
   useEffect(() => {
     if (musicXML && containerRef.current) {
-      renderMusic();
+      // Small delay to ensure container is fully rendered
+      const timeoutId = setTimeout(renderMusic, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [musicXML, renderMusic]);
 
@@ -138,36 +300,52 @@ const OSMDComponent: React.FC<OSMDComponentProps> = ({
         }
         osmdRef.current = null;
       }
+
+      // Clean up resize observer
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
     };
   }, []);
 
   // Render the component
   return (
-    <div className={`osmd-wrapper ${className}`}>
+    <div className={`osmd-wrapper w-full ${className}`}>
       {/* Loading state */}
       {isLoading && showLoadingSpinner && <LoadingSpinner />}
 
       {/* Error state */}
       {error && <ErrorDisplay message={error} />}
 
-      {/* OSMD container - this is where the sheet music will be rendered */}
+      {/* OSMD container - responsive and flexible */}
       <div
         ref={containerRef}
-        className="osmd-container p-6 min-h-[400px] overflow-auto"
+        className="osmd-container w-full min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] overflow-auto bg-white rounded-lg shadow-sm border border-border"
         style={{
           width: width ? `${width}px` : "100%",
           height: height ? `${height}px` : "auto",
           display: isLoading || error ? "none" : "block",
+          minHeight: "400px",
+          // Performance optimization
+          willChange: "auto",
+          contain: "layout style paint",
         }}
       />
 
       {/* Debug info (only in development) */}
       {process.env.NODE_ENV === "development" && (
-        <div className="mt-4 p-2 bg-gray-100 text-xs text-gray-600 rounded">
-          <div>
-            Status: {isLoading ? "Loading" : error ? "Error" : "Loaded"}
+        <div className="mt-4 p-3 bg-muted text-xs text-muted-foreground rounded-lg">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              Status: {isLoading ? "Loading" : error ? "Error" : "Loaded"}
+            </div>
+            <div>Content: {musicXML?.length || 0} chars</div>
+            <div>
+              Container: {containerDimensions.width}×
+              {containerDimensions.height}
+            </div>
+            <div>Zoom: {osmdRef.current?.zoom?.toFixed(2) || "N/A"}</div>
           </div>
-          <div>Content Length: {musicXML?.length || 0} characters</div>
         </div>
       )}
     </div>
