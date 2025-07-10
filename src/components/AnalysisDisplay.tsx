@@ -21,6 +21,7 @@ import AnalysisResults from "./AnalysisResults";
 import MusicTheoryLoader from "./MusicTheoryContent ";
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
+import MidiPlayer from "./MidiPlayer";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface AnalysisDisplayProps {
@@ -54,159 +55,13 @@ export default function AnalysisDisplay({
   const [isMidiLoading, setIsMidiLoading] = useState(false); // New state for loading isLoading, setIsLoading] = useState(false);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (midiData && !parsedMidi) {
-      initializeMidiPlayer();
-    }
-  }, [midiData, parsedMidi]);
-
-  // Cleanup effect for progress tracking
-  useEffect(() => {
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-    };
-  }, []);
-
   // Add this function to initialize the MIDI player
-  const initializeMidiPlayer = async () => {
-    setIsMidiLoading(true);
-    try {
-      // Parse MIDI data using @tonejs/midi
-      const midi = new Midi(midiData!);
-      console.log("Parsed MIDI:", midi);
-
-      // Create a polyphonic synthesizer for better sound
-      const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-
-      setParsedMidi(midi);
-      setMidiPlayer({ synth, midi });
-      setDuration(midi.duration);
-      setPlaybackError(null);
-    } catch (error) {
-      console.error("Failed to initialize MIDI player:", error);
-      setPlaybackError("Failed to parse MIDI file");
-    } finally {
-      setIsMidiLoading(false);
-    }
-  };
 
   // Helper function to format time as MM:SS
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  // Helper function to start progress tracking
-  const startProgressTracking = () => {
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-
-    progressIntervalRef.current = setInterval(() => {
-      const transportTime = Tone.Transport.seconds;
-      setCurrentTime(transportTime);
-
-      // Auto-stop if we've reached the end
-      if (transportTime >= duration) {
-        stopPlayback();
-      }
-    }, 100); // Update every 100ms for smooth progress
-  };
-
-  // Helper function to stop progress tracking
-  const stopProgressTracking = () => {
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
-  };
-
-  // Helper function to stop playback
-  const stopPlayback = () => {
-    Tone.Transport.stop();
-    Tone.Transport.cancel();
-    stopProgressTracking();
-    setIsPlaying(false);
-    setCurrentTime(0);
-  };
-
-  // Add this function to handle seeking
-  const handleSeek = (newTime: number) => {
-    if (!midiPlayer || !parsedMidi) return;
-
-    const wasPlaying = isPlaying;
-
-    // Stop current playback
-    if (isPlaying) {
-      stopPlayback();
-    }
-
-    // Set new position
-    setCurrentTime(newTime);
-
-    // If was playing, restart from new position
-    if (wasPlaying) {
-      startPlaybackFromTime(newTime);
-    }
-  };
-
-  // Helper function to start playback from specific time
-  const startPlaybackFromTime = async (startTime: number = 0) => {
-    if (!midiPlayer || !parsedMidi) return;
-
-    try {
-      // Start audio context if suspended
-      if (Tone.context.state === "suspended") {
-        await Tone.start();
-      }
-
-      // Clear any existing scheduled events
-      Tone.Transport.cancel();
-
-      const { synth, midi } = midiPlayer;
-
-      // Schedule all MIDI events from the start time
-      midi.tracks.forEach((track: any) => {
-        track.notes.forEach((note: any) => {
-          if (note.time >= startTime) {
-            Tone.Transport.schedule((time: number) => {
-              synth.triggerAttackRelease(
-                note.name,
-                note.duration,
-                time,
-                note.velocity
-              );
-            }, note.time - startTime);
-          }
-        });
-      });
-
-      // Start transport and progress tracking
-      Tone.Transport.start();
-      startProgressTracking();
-      setIsPlaying(true);
-    } catch (error) {
-      console.error("Playback error:", error);
-      setPlaybackError(
-        "Playback failed: " +
-          (error instanceof Error ? error.message : String(error))
-      );
-      setIsPlaying(false);
-    }
-  };
-
-  // Add this function to handle play/pause
-  const togglePlayback = async () => {
-    if (!midiPlayer || !parsedMidi) return;
-
-    if (isPlaying) {
-      stopPlayback();
-    } else {
-      await startPlaybackFromTime(currentTime);
-    }
   };
 
   const [windowWidth, setWindowWidth] = useState(
@@ -257,11 +112,8 @@ export default function AnalysisDisplay({
           }
 
           const contentType = response.headers.get("content-type");
-          console.log("Response content type:", contentType);
 
           const textContent = await response.text();
-          console.log("Response length:", textContent.length);
-          console.log("First 200 characters:", textContent.substring(0, 200));
 
           if (
             !textContent.trim().startsWith("<?xml") &&
@@ -317,11 +169,6 @@ export default function AnalysisDisplay({
         setMidiError(null);
 
         try {
-          console.log(
-            "Fetching MIDI from:",
-            `${API_URL}${data.score.midi_url}`
-          );
-
           const response = await fetch(`${API_URL}${data.score.midi_url}`, {
             method: "GET",
             headers: {
@@ -354,7 +201,7 @@ export default function AnalysisDisplay({
 
   // OSMD event handlers
   const handleMusicLoad = () => {
-    console.log("MusicXML loaded successfully in OSMD");
+    // console.log("MusicXML loaded successfully in OSMD");
     setMusicXmlLoaded(true);
     setMusicXmlError(null);
   };
@@ -530,6 +377,7 @@ export default function AnalysisDisplay({
                   <AnalysisResults
                     results={data.score.results}
                     musicXmlContent={musicXmlContent}
+                    parsedMidi={parsedMidi}
                   />
                 ) : (
                   <div className="text-center py-8">
@@ -548,113 +396,21 @@ export default function AnalysisDisplay({
           <TabsContent value="musicxml">
             <Card>
               <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <CardTitle className="flex items-center gap-2">
                     <FileMusic className="h-5 w-5" />
                     Sheet Music Viewer
                   </CardTitle>
                   <div className="flex flex-col sm:flex-row gap-2">
                     {/* MIDI Playback Controls */}
-                    {midiData && !midiError && (
-                      <div className="flex flex-col gap-2 w-full sm:w-auto">
-                        {/* Play/Pause and Time Display */}
-                        <div className="flex items-center gap-2 justify-between sm:justify-start">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant={isPlaying ? "default" : "outline"}
-                              size="sm"
-                              onClick={togglePlayback}
-                              disabled={!midiPlayer || isMidiLoading}
-                              className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9"
-                            >
-                              {isMidiLoading ? (
-                                <>
-                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
-                                  <span className="hidden xs:inline">
-                                    Loading
-                                  </span>
-                                </>
-                              ) : isPlaying ? (
-                                <>
-                                  <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
-                                    <div className="h-2 w-2 bg-white rounded-sm"></div>
-                                  </div>
-                                  <span className="hidden xs:inline">
-                                    Pause
-                                  </span>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
-                                    <div className="w-0 h-0 border-l-[6px] border-l-current border-y-[4px] border-y-transparent"></div>
-                                  </div>
-                                  <span className="hidden xs:inline">Play</span>
-                                </>
-                              )}
-                            </Button>
-
-                            {/* Stop Button */}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                stopPlayback();
-                                setCurrentTime(0);
-                              }}
-                              disabled={!midiPlayer || isMidiLoading}
-                              className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9"
-                            >
-                              <div className="h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
-                                <div className="h-2 w-2 bg-current"></div>
-                              </div>
-                              <span className="hidden xs:inline">Stop</span>
-                            </Button>
-                          </div>
-
-                          {/* Time Display */}
-                          {parsedMidi && (
-                            <div className="text-xs sm:text-sm text-gray-600 font-mono">
-                              {formatTime(currentTime)} / {formatTime(duration)}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Progress Bar */}
-                        {parsedMidi && (
-                          <div className="flex items-center gap-2 w-full">
-                            <div className="flex-1 relative">
-                              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-orange-500 transition-all duration-100 ease-linear"
-                                  style={{
-                                    width: `${
-                                      duration > 0
-                                        ? (currentTime / duration) * 100
-                                        : 0
-                                    }%`,
-                                  }}
-                                ></div>
-                              </div>
-                              {/* Clickable overlay for seeking */}
-                              <button
-                                className="absolute inset-0 w-full h-full cursor-pointer hover:bg-black hover:bg-opacity-10 rounded-full"
-                                onClick={(e) => {
-                                  const rect =
-                                    e.currentTarget.getBoundingClientRect();
-                                  const x = e.clientX - rect.left;
-                                  const percentage = x / rect.width;
-                                  const newTime = percentage * duration;
-                                  handleSeek(
-                                    Math.max(0, Math.min(newTime, duration))
-                                  );
-                                }}
-                                disabled={!midiPlayer || isMidiLoading}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    <MidiPlayer
+                      midiData={midiData}
+                      midiError={midiError}
+                      isLoadingMidi={isLoadingMidi}
+                      onDownloadMidi={handleDownloadMidi}
+                      API_URL={API_URL}
+                      midiUrl={data?.score?.midi_url}
+                    />
 
                     {/* Download Buttons */}
                     <div className="flex gap-2">

@@ -238,9 +238,9 @@ const OSMDComponent: React.FC<OSMDComponentProps> = ({
         height: containerHeight,
       });
 
-      console.log(
-        `MusicXML rendered successfully at ${containerWidth}x${containerHeight} with zoom ${osmdRef.current.zoom}`
-      );
+      // console.log(
+      //   `MusicXML rendered successfully at ${containerWidth}x${containerHeight} with zoom ${osmdRef.current.zoom}`
+      // );
       setIsLoading(false);
 
       // Call success callback

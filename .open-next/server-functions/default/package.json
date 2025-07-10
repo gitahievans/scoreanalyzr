@@ -54,6 +54,7 @@
     "@tanstack-query-firebase/react": "^1.0.5",
     "@tanstack/react-query": "^5.76.2",
     "@tonejs/midi": "^2.0.28",
+    "@tonejs/piano": "^0.2.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",

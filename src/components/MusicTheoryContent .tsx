@@ -261,13 +261,13 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
             </h3>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span
+            {/* <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(
                 currentContent.complexity
               )}`}
             >
               {currentContent.complexity}
-            </span>
+            </span> */}
             <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 capitalize">
               {currentContent.category}
             </span>
@@ -303,7 +303,7 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-100 ease-out"
+              className="bg-orange-600 h-2 rounded-full transition-all duration-100 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -363,7 +363,7 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
 
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {/* <span className="text-sm font-medium">Next</span> */}
               <ChevronRight className="w-4 h-4" />
@@ -377,8 +377,8 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-gray-500">
           <Clock className="w-4 h-4" />
           <span className="text-xs sm:text-sm text-center">
-            Analysis typically takes 45 - 180 seconds depending on the score
-            size & complexity.
+            Analysis typically takes 45 seconds - 5 minutes depending on the
+            score size & complexity.
           </span>
         </div>
       </div>
