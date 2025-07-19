@@ -30,7 +30,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/notadb": {
+    "/": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -43,8 +43,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/notadb",
-      "dataRoute": "/notadb.rsc",
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -78,7 +78,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
+    "/notadb": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -91,8 +91,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
+      "srcRoute": "/notadb",
+      "dataRoute": "/notadb.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -106,8 +106,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "8db4b0196bf9497cc42d0dcf28cdcbf8",
-    "previewModeSigningKey": "cc65050eb1ae2dae41d4af2c66f0302f1d6907194febfc184dd96a00d8bb1f02",
-    "previewModeEncryptionKey": "393740f20b337e00c378bec2ee8eb833f45c307bbffb714202cee571d0992373"
+    "previewModeId": "4896c1007a708132379ff3e52d641900",
+    "previewModeSigningKey": "4e70747096865977a989152de784a11e4414f89755f3d22fd85d07dcdb0314d7",
+    "previewModeEncryptionKey": "0b1ab55b675e14110d6711db7c80d90d2de44434d5cd910203f26cb95fbbcf62"
   }
 }

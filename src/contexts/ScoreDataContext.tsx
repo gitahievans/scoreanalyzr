@@ -2,138 +2,16 @@
 
 import React, { createContext, useContext } from "react";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
-
-// Updated interface to match your new backend response structure
-interface Chord {
-  pitch: string;
-  offset: number;
-}
-
-interface Dynamics {
-  values: string[];
-  has_dynamics: boolean;
-}
-
-interface Accidentals {
-  flats: number;
-  others: number;
-  sharps: number;
-  naturals: number;
-  has_accidentals: boolean;
-}
-
-interface Articulation {
-  count: number;
-  has_accent?: boolean;
-  has_tenuto?: boolean;
-  has_staccato?: boolean;
-}
-
-interface Articulations {
-  accent: Articulation;
-  tenuto: Articulation;
-  staccato: Articulation;
-}
-
-interface ChartDataset {
-  data: number[];
-  label: string;
-  backgroundColor: string[];
-}
-
-interface ChartData {
-  labels: string[];
-  datasets: ChartDataset[];
-}
-
-interface ChartOptions {
-  scales: {
-    x: {
-      title: {
-        text: string;
-        display: boolean;
-      };
-    };
-    y: {
-      title: {
-        text: string;
-        display: boolean;
-      };
-      beginAtZero: boolean;
-    };
-  };
-  plugins: {
-    title: {
-      text: string;
-      display: boolean;
-    };
-  };
-}
-
-interface NotableElementsChart {
-  data: ChartData;
-  type: string;
-  options: ChartOptions;
-}
-
-interface Visualizations {
-  notable_elements_chart: NotableElementsChart;
-}
-
-interface NotableElements {
-  dynamics: Dynamics;
-  accidentals: Accidentals;
-  articulations: Articulations;
-  visualizations: Visualizations;
-}
-
-interface ScoreStructure {
-  parts: string[];
-  music_type: string;
-  score_type: string;
-  instruments: string[];
-  ensemble_type: string;
-}
-
-interface ScoreResults {
-  key: string;
-  parts: string[];
-  chords: Chord[];
-  time_signature: string;
-  score_structure: ScoreStructure;
-  notable_elements: NotableElements;
-}
-
-interface Score {
-  id: number;
-  title: string;
-  lyrics: string[] | null;
-  pdf_file: string | null;
-  composer: string;
-  year: number | undefined;
-  categories: string[];
-  results: ScoreResults | null;
-  processed: boolean;
-  musicxml_url: string | null;
-  midi_url: string | null;
-}
-
-interface TaskStatus {
-  state: string;
-  info: string | null;
-}
-
-interface ScoreResponse {
-  score: Score;
-  task_status: TaskStatus;
-}
-
-interface ScoreDataContextState {
-  scoreData: ScoreResponse | null | undefined;
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => Promise<QueryObserverResult<ScoreResponse, Error>>;
-}
+import {
+  ScoreDataContextState,
+  ScoreResponse,
+  Score,
+  TaskStatus,
+  ScoreResults,
+  ScoreStructure,
+  NotableElements,
+  Chord,
+} from "@/lib/types";
 
 export const ScoreDataContext = createContext<
   ScoreDataContextState | undefined
@@ -151,8 +29,16 @@ export const fetchScore = async (
   );
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to fetch score");
+    const errorData = await response.json().catch(() => ({}));
+
+    // Create a more specific error object that includes the status code
+    const error = new Error(
+      errorData.message || `Server error: ${response.status}`
+    );
+    (error as any).status = response.status;
+    (error as any).isServerError = response.status >= 500;
+
+    throw error;
   }
   const data = await response.json();
   console.log("Parsed Score data from Context:", data);
@@ -176,6 +62,21 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
     enabled: !!scoreId && !!taskId,
     refetchInterval: (query) => {
       const data = query.state.data;
+      const error = query.state.error;
+
+      // Stop polling if there's a server error (5xx status codes)
+      if (error && (error as any).isServerError) {
+        console.log("Server error detected, stopping polling:", error.message);
+        return false;
+      }
+
+      // Stop polling if there are too many consecutive errors
+      if (query.state.errorUpdateCount >= 3) {
+        console.log("Too many consecutive errors, stopping polling");
+        return false;
+      }
+
+      // Continue polling only if the task is still pending and not processed
       return data &&
         data?.task_status?.state === "PENDING" &&
         !data?.score?.processed
@@ -183,9 +84,17 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
         : false;
     },
     retry: (failureCount, errorInstance) => {
+      // Don't retry server errors (5xx) - they're likely not transient
+      if ((errorInstance as any).isServerError) {
+        console.log("Server error - not retrying:", errorInstance.message);
+        return false;
+      }
+
+      // Retry up to 3 times for other errors (network issues, etc.)
       if (failureCount >= 3) return false;
       return true;
     },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
   });
 
   return (

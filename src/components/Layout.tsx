@@ -21,11 +21,11 @@ export function Layout({ children }: { children: ReactNode }) {
   const [opened, { toggle, close }] = useDisclosure();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const navigationItems = [
-    { icon: IconHome2, label: "Analyzr", link: "/" },
-    { icon: IconFiles, label: "Collection", link: "/notadb" },
-    { icon: IconUpload, label: "Upload New", link: "/upload" },
-  ];
+  // const navigationItems = [
+  //   // { icon: IconHome2, label: "Analyzr", link: "/" },
+  //   // { icon: IconFiles, label: "Collection", link: "/notadb" },
+  //   // { icon: IconUpload, label: "Upload New", link: "/upload" },
+  // ];
 
   interface NavButtonProps {
     icon: React.ComponentType<{
@@ -72,16 +72,16 @@ export function Layout({ children }: { children: ReactNode }) {
               href="/"
               className="text-xl font-bold text-orange-600 no-underline"
             >
-              Notanalyzr
+              ScoreAnalyzr
             </Link>
           </Group>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* <div className="hidden md:flex items-center gap-2">
             {navigationItems.map((item) => (
               <NavButton key={item.label} {...item} />
             ))}
-          </div>
+          </div> */}
 
           {/* Mobile Burger Menu */}
           <Burger
@@ -102,11 +102,11 @@ export function Layout({ children }: { children: ReactNode }) {
         overlayProps={{ opacity: 0.5, blur: 4 }}
         position="right"
       >
-        <div className="flex flex-col gap-4 p-2">
+        {/* <div className="flex flex-col gap-4 p-2">
           {navigationItems.map((item) => (
             <NavButton key={item.label} {...item} onClick={close} />
           ))}
-        </div>
+        </div> */}
       </Drawer>
 
       <AppShell.Main className="bg-orange-50">

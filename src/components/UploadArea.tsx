@@ -272,7 +272,7 @@ export default function UploadArea({
                   : "Drag a PDF or image file here or click to select"}
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                Supported formats: PDF, JPEG, PNG, GIF, BMP, TIFF, WebP
+                Supported formats: PDF, JPEG, PNG, TIFF
               </p>
               <p className="text-sm text-gray-500">Maximum file size: 5MB</p>
               {error && <p className="text-sm text-red-500 mt-2">{error}</p>}

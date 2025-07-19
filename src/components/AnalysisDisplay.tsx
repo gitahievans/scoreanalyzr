@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useScoreData } from "@/contexts/ScoreDataContext";
@@ -14,14 +14,15 @@ import {
   RefreshCcw,
   Sparkles,
   Download,
+  RotateCcw,
+  AlertCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { renderFormattedText } from "@/lib/renderText";
 import { Divider } from "@mantine/core";
 import AnalysisResults from "./AnalysisResults";
-import MusicTheoryLoader from "./MusicTheoryContent ";
-import * as Tone from "tone";
-import { Midi } from "@tonejs/midi";
 import MidiPlayer from "./MidiPlayer";
+import MusicTheoryLoader from "./MusicTheoryContent ";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface AnalysisDisplayProps {
@@ -52,12 +53,11 @@ export default function AnalysisDisplay({
   const [parsedMidi, setParsedMidi] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isMidiLoading, setIsMidiLoading] = useState(false); // New state for loading isLoading, setIsLoading] = useState(false);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Add this function to initialize the MIDI player
+  const isServerError = (error: any): boolean => {
+    return error?.isServerError || (error?.status && error.status >= 500);
+  };
 
-  // Helper function to format time as MM:SS
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -201,7 +201,6 @@ export default function AnalysisDisplay({
 
   // OSMD event handlers
   const handleMusicLoad = () => {
-    // console.log("MusicXML loaded successfully in OSMD");
     setMusicXmlLoaded(true);
     setMusicXmlError(null);
   };
@@ -223,7 +222,6 @@ export default function AnalysisDisplay({
   };
 
   const handleGenerateSummary = async () => {
-    // Check if we have a score ID
     if (!data?.score?.id) {
       setSummaryError("No score ID available for summary generation");
       return;
@@ -247,7 +245,6 @@ export default function AnalysisDisplay({
 
       const result = await response.json();
 
-      // Check if the response has the expected structure
       if (result.status === "success") {
         if (result.summary) {
           setSummary(result.summary);
@@ -296,6 +293,8 @@ export default function AnalysisDisplay({
   };
 
   if (error) {
+    const isServerErr = isServerError(error);
+
     return (
       <div className="space-y-6 p-4">
         <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
@@ -303,13 +302,70 @@ export default function AnalysisDisplay({
         </h2>
         <Card>
           <CardHeader>
-            <CardTitle>Error</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {isServerErr ? (
+                <>
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Server Error
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-5 w-5 text-orange-500" />
+                  Connection Error
+                </>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{error.message}</p>
-            <Button className="mt-4" onClick={() => refetch()}>
-              Retry
-            </Button>
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 font-medium">
+                  {isServerErr
+                    ? "The server encountered an error while processing your score."
+                    : "Unable to connect to the server."}
+                </p>
+                <p className="text-red-600 text-sm mt-2">{error.message}</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => refetch()}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Try Again
+                </Button>
+
+                {isServerErr && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => window.location.reload()}
+                    className="flex items-center gap-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Refresh Page
+                  </Button>
+                )}
+              </div>
+
+              {isServerErr && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-yellow-800 text-sm">
+                    <strong>What you can do:</strong>
+                  </p>
+                  <ul className="text-yellow-700 text-sm mt-2 space-y-1">
+                    <li>
+                      • It is likely your file is too large or too complex. If
+                      it is an image, it might be of very low resolution to be
+                      processed.
+                    </li>
+                    <li>• Check if the file you uploaded is valid</li>
+                    <li>• Try uploading a different score</li>
+                  </ul>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -351,28 +407,59 @@ export default function AnalysisDisplay({
         />
       ) : (
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
-            <TabsTrigger value="results" className="px-2 sm:px-4">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-4 h-auto p-1 bg-gray-100 rounded-lg">
+            <TabsTrigger
+              value="results"
+              className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
+            >
+              <span className="sm:hidden text-center leading-tight">
+                Results
+              </span>
               <span className="hidden sm:inline">Analysis Results</span>
-              <span className="sm:hidden">Results</span>
             </TabsTrigger>
-            <TabsTrigger value="musicxml" className="px-2 sm:px-4">
+            <TabsTrigger
+              value="musicxml"
+              className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
+            >
+              <span className="sm:hidden text-center leading-tight">
+                Sheet
+                <br />
+                Music
+              </span>
               <span className="hidden sm:inline">Sheet Music</span>
-              <span className="sm:hidden">Music</span>
             </TabsTrigger>
-            <TabsTrigger value="summary" className="px-2 sm:px-4">
+            <TabsTrigger
+              value="midi"
+              className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
+            >
+              <span className="sm:hidden text-center leading-tight">
+                MIDI
+                <br />
+                Player
+              </span>
+              <span className="hidden sm:inline">MIDI Player</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="summary"
+              className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
+            >
+              <span className="sm:hidden text-center leading-tight">
+                AI
+                <br />
+                Summary
+              </span>
               <span className="hidden sm:inline">AI Summary</span>
-              <span className="sm:hidden">Summary</span>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="results">
+
+          <TabsContent value="results" className="mt-6">
             <Card>
-              <CardHeader>
-                <h1 className="text-2xl font-semibold">
+              <CardHeader className="pb-4">
+                <h1 className="text-xl sm:text-2xl font-semibold px-2 sm:px-0">
                   {data?.score?.title || "No title"}
                 </h1>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 {data?.score?.results ? (
                   <AnalysisResults
                     results={data.score.results}
@@ -384,7 +471,7 @@ export default function AnalysisDisplay({
                     <div className="text-gray-400 mb-2">
                       <Music className="h-12 w-12 mx-auto" />
                     </div>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 px-4">
                       No analysis results available for this score.
                     </p>
                   </div>
@@ -393,101 +480,41 @@ export default function AnalysisDisplay({
             </Card>
           </TabsContent>
 
-          <TabsContent value="musicxml">
+          <TabsContent value="musicxml" className="mt-6">
             <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center gap-2 px-2 sm:px-0">
                     <FileMusic className="h-5 w-5" />
                     Sheet Music Viewer
                   </CardTitle>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    {/* MIDI Playback Controls */}
-                    <MidiPlayer
-                      midiData={midiData}
-                      midiError={midiError}
-                      isLoadingMidi={isLoadingMidi}
-                      onDownloadMidi={handleDownloadMidi}
-                      API_URL={API_URL}
-                      midiUrl={data?.score?.midi_url}
-                    />
-
-                    {/* Download Buttons */}
-                    <div className="flex gap-2">
-                      {musicXmlContent && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleDownloadMusicXml}
-                          className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9 w-full sm:w-auto"
-                        >
-                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="hidden xs:inline">Download</span> XML
-                        </Button>
-                      )}
-                      {midiData && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleDownloadMidi}
-                          className="flex items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 h-8 sm:h-9 w-full sm:w-auto"
-                        >
-                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="hidden xs:inline">
-                            Download
-                          </span>{" "}
-                          MIDI
-                        </Button>
-                      )}
-                    </div>
+                  <div className="flex flex-col sm:flex-row gap-2 px-2 sm:px-0">
+                    {musicXmlContent && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadMusicXml}
+                        className="flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 h-10 w-full sm:w-auto"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download XML
+                      </Button>
+                    )}
                   </div>
                 </div>
                 {musicXmlContent && (
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-sm text-gray-500 mt-2 px-2 sm:px-0">
                     Rendered from: {data?.score?.title || "Untitled Score"}
                   </div>
                 )}
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 {musicXmlContent ? (
                   <div className="space-y-4">
-                    {isLoadingMidi && (
-                      <Alert>
-                        <AlertDescription className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-                          Loading MIDI file...
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {midiError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>
-                          It was not possible to generate MIDI from the file you
-                          uploaded.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {playbackError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{playbackError}</AlertDescription>
-                      </Alert>
-                    )}
-
-                    {musicXmlError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>
-                          It was not possible to generate MusicXML from the file
-                          you uploaded.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
                     {musicXmlError && (
                       <Alert className="mb-4">
                         <AlertDescription>
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex flex-col gap-3">
                             <span className="text-sm">
                               It was not possible to generate MusicXML from the
                               file you uploaded.
@@ -496,7 +523,7 @@ export default function AnalysisDisplay({
                               variant="outline"
                               size="sm"
                               onClick={retryFetch}
-                              className="self-start sm:self-auto"
+                              className="w-full sm:w-auto"
                             >
                               Retry
                             </Button>
@@ -508,20 +535,15 @@ export default function AnalysisDisplay({
                     {musicXmlLoaded && !musicXmlError && (
                       <Alert>
                         <AlertDescription className="text-green-700 text-sm">
-                          Sheet music loaded successfully! You can scroll and
-                          zoom to explore the notation.
-                          {midiData && !midiError && parsedMidi && (
-                            <span className="block mt-1">
-                              🎵 MIDI playback ready • Duration:{" "}
-                              {formatTime(duration)} •{" "}
-                              {parsedMidi.tracks.length} track(s)
-                            </span>
-                          )}
+                          Sheet music loaded successfully!
+                          <span className="hidden sm:inline">
+                            {" "}
+                            You can scroll and zoom to explore the notation.
+                          </span>
                         </AlertDescription>
                       </Alert>
                     )}
 
-                    {/* Responsive OSMD container */}
                     <OSMDComponent
                       musicXML={musicXmlContent}
                       showLoadingSpinner={true}
@@ -530,46 +552,24 @@ export default function AnalysisDisplay({
                       className="w-full h-full"
                     />
 
-                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500 px-2">
-                      <div>
-                        <span className="hidden sm:inline">
-                          Use mouse wheel to zoom, click and drag to pan
-                        </span>
-                        <span className="sm:hidden">
-                          Pinch to zoom, drag to pan
-                        </span>
-                      </div>
-                      {midiData && !midiError && parsedMidi && (
-                        <div className="text-orange-600 flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            <div
-                              className={`w-2 h-2 rounded-full ${
-                                isPlaying
-                                  ? "bg-green-500 animate-pulse"
-                                  : "bg-gray-400"
-                              }`}
-                            ></div>
-                            <span className="hidden sm:inline">
-                              {isPlaying ? "Playing" : "Ready"} •{" "}
-                              {formatTime(duration)}
-                            </span>
-                            <span className="sm:hidden">
-                              {isPlaying ? "▶️" : "⏸️"} {formatTime(duration)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+                    <div className="text-xs text-gray-500 text-center">
+                      <span className="hidden sm:inline">
+                        Use mouse wheel to zoom, click and drag to pan
+                      </span>
+                      <span className="sm:hidden">
+                        Pinch to zoom, drag to pan
+                      </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
+                  <div className="text-center py-8 sm:py-12 px-4">
                     <div className="text-gray-400 mb-4">
                       <FileMusic className="h-12 w-12 sm:h-16 sm:w-16 mx-auto" />
                     </div>
                     <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                       No MusicXML Available
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto px-4">
+                    <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
                       The sheet music notation is not available for this score.
                       This could happen if the analysis is still processing or
                       if the original image couldn't be converted to MusicXML
@@ -580,7 +580,7 @@ export default function AnalysisDisplay({
                         <Button
                           variant="outline"
                           onClick={() => refetch()}
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 w-full sm:w-auto"
                           size="sm"
                         >
                           <RefreshCcw className="h-4 w-4" />
@@ -594,64 +594,159 @@ export default function AnalysisDisplay({
             </Card>
           </TabsContent>
 
-          <TabsContent value="summary">
+          <TabsContent value="midi" className="mt-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 px-2 sm:px-0">
+                  <Music className="h-5 w-5" />
+                  MIDI Player
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-2 sm:px-6">
+                <div className="space-y-4">
+                  {isLoadingMidi && (
+                    <Alert>
+                      <AlertDescription className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                        Loading MIDI file...
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {midiError && (
+                    <Alert variant="destructive">
+                      <AlertDescription className="text-sm">
+                        It was not possible to generate MIDI from the file you
+                        uploaded.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {playbackError && (
+                    <Alert variant="destructive">
+                      <AlertDescription className="text-sm">
+                        {playbackError}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {midiData && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadMidi}
+                      className="flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 h-10 w-full sm:w-auto"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download MIDI
+                    </Button>
+                  )}
+
+                  {midiData && !midiError && parsedMidi && (
+                    <Alert>
+                      <AlertDescription className="text-green-700 text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                          <span>MIDI playback ready</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span>Duration: {formatTime(duration)}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span>{parsedMidi.tracks.length} track(s)</span>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <MidiPlayer
+                    midiData={midiData}
+                    midiError={midiError}
+                    isLoadingMidi={isLoadingMidi}
+                    onDownloadMidi={handleDownloadMidi}
+                    API_URL={API_URL}
+                    midiUrl={data?.score?.midi_url}
+                  />
+
+                  {midiData && !midiError && parsedMidi && (
+                    <div className="text-orange-600 flex items-center justify-center sm:justify-start gap-2">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            isPlaying
+                              ? "bg-green-500 animate-pulse"
+                              : "bg-gray-400"
+                          }`}
+                        ></div>
+                        <span className="text-sm">
+                          {isPlaying ? "Playing" : "Ready"} •{" "}
+                          {formatTime(duration)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="summary" className="mt-6">
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 px-2 sm:px-0">
                   <Brain className="h-5 w-5" />
                   AI-Generated Musical Analysis
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 {summaryError && (
                   <Alert variant="destructive" className="mb-4">
-                    <AlertDescription>{summaryError}</AlertDescription>
+                    <AlertDescription className="text-sm">
+                      {summaryError}
+                    </AlertDescription>
                   </Alert>
                 )}
                 {isGeneratingSummary ? (
-                  <div className="flex items-center justify-center p-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-3"></div>
-                    <p className="text-gray-600">Generating AI summary...</p>
+                  <div className="flex flex-col items-center justify-center p-8 gap-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                    <p className="text-gray-600 text-center">
+                      Generating AI summary...
+                    </p>
                   </div>
                 ) : summary ? (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
-                      <div className="text-gray-800">
-                        {renderFormattedText(summary)}
-                      </div>
-                      <Divider className="my-4" />
-                      <div className="text-gray-800">
-                        {renderFormattedText(cleanedText || "")}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+                      <div className="text-gray-800 space-y-4">
+                        <div>{renderFormattedText(summary)}</div>
+                        <Divider className="my-4" />
+                        <div>{renderFormattedText(cleanedText || "")}</div>
                       </div>
                     </div>
-                    <div className="flex justify-end pt-2">
+                    <div className="flex justify-center sm:justify-end pt-2">
                       <Button
                         onClick={handleGenerateSummary}
                         variant="outline"
                         size="sm"
                         disabled={isGeneratingSummary}
-                        className="flex items-center gap-2 hover:bg-gray-50"
+                        className="flex items-center gap-2 hover:bg-gray-50 w-full sm:w-auto"
                       >
                         <RefreshCcw className="h-4 w-4" /> Regenerate Summary
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center text-center py-12">
+                  <div className="flex flex-col items-center text-center py-8 sm:py-12 px-4">
                     <div className="text-gray-400 mb-4">
-                      <Brain className="h-16 w-16 mx-auto opacity-50" />
+                      <Brain className="h-12 w-12 sm:h-16 sm:w-16 mx-auto opacity-50" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                       No AI Summary Yet
                     </h3>
-                    <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                    <p className="text-sm sm:text-base text-gray-500 mb-6 max-w-md mx-auto">
                       Generate an AI-powered musical analysis and summary of
                       this score to get insights about its style, structure, and
                       characteristics.
                     </p>
                     <Button
                       onClick={handleGenerateSummary}
-                      className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                      className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 w-full sm:w-auto"
                       disabled={isGeneratingSummary || !data?.score?.id}
                     >
                       <Sparkles className="h-4 w-4" />

@@ -334,7 +334,7 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
 
               <button
                 onClick={handleNext}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {/* <span className="text-sm font-medium">Next</span> */}
                 <ChevronRight className="w-4 h-4" />
@@ -374,11 +374,17 @@ const MusicTheoryLoader: React.FC<MusicTheoryLoaderProps> = ({
 
       {/* Footer */}
       <div className="text-center">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-gray-500">
-          <Clock className="w-4 h-4" />
+        <div className="flex flex-col gap-2 text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 ">
+            <Clock className="w-4 h-4" />
+            <span className="text-xs sm:text-sm text-center">
+              Analysis typically takes 45 seconds - 5 minutes depending on the
+              score size & complexity.
+            </span>
+          </div>
           <span className="text-xs sm:text-sm text-center">
-            Analysis typically takes 45 seconds - 5 minutes depending on the
-            score size & complexity.
+            There is a time limit of 5 minutes for each analysis. If your score
+            is not processed within this time, it may be too large or complex.
           </span>
         </div>
       </div>

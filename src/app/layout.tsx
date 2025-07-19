@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "notanalyzr",
+  title: "scoreanalyzr",
   description: "Analyze your music scores with AI",
 };
 
