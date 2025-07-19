@@ -30,30 +30,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/upload": {
       "experimentalBypassFor": [
         {
@@ -101,13 +77,37 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
+    },
+    "/": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "4896c1007a708132379ff3e52d641900",
-    "previewModeSigningKey": "4e70747096865977a989152de784a11e4414f89755f3d22fd85d07dcdb0314d7",
-    "previewModeEncryptionKey": "0b1ab55b675e14110d6711db7c80d90d2de44434d5cd910203f26cb95fbbcf62"
+    "previewModeId": "06c44d1178d3cf05eb486372052f1c60",
+    "previewModeSigningKey": "245adcb18621ea84cf24898f037e872d2a0a55115605923ae780d7f4c29bce6c",
+    "previewModeEncryptionKey": "76d1dbacbe9cf87e68907ee8cf73201a73d0c7730eb9f172e9754000cf64a716"
   }
 }
