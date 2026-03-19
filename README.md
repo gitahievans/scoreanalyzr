@@ -1,4 +1,4 @@
-# Notalyzr
+# Scoreanalyzr
 
 A modern web application for music analysis, visualization, and education built with Next.js and TypeScript.
 
