@@ -14,5 +14,15 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "scorelearn.site",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.scorelearn.site",
+      "custom_domain": true
+    }
+  ]
 }
