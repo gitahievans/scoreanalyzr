@@ -23,7 +23,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   // const navigationItems = [
   //   // { icon: IconHome2, label: "Analyzr", link: "/" },
-  //   // { icon: IconFiles, label: "Collection", link: "/scorelearn" },
+  //   // { icon: IconFiles, label: "Collection", link: "/notadb" },
   //   // { icon: IconUpload, label: "Upload New", link: "/upload" },
   // ];
 
@@ -72,7 +72,7 @@ export function Layout({ children }: { children: ReactNode }) {
               href="/"
               className="text-xl font-bold text-orange-600 no-underline"
             >
-              Scorelearn
+              ScoreAnalyzr
             </Link>
           </Group>
 

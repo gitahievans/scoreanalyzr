@@ -24,8 +24,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scorelearn",
-  description: "Turn music scores and audio into notation, playback, and approachable theory insights.",
+  title: "scoreanalyzr",
+  description: "Analyze your music scores with AI",
 };
 
 export default function RootLayout({

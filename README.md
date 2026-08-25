@@ -1,10 +1,10 @@
-# Scorelearn
+# Scoreanalyzr
 
 A modern web application for music analysis, visualization, and education built with Next.js and TypeScript.
 
 ## Overview
 
-Scorelearn is a powerful music analysis tool that combines modern web technologies with advanced music theory concepts. It provides a comprehensive platform for musicians, educators, and enthusiasts to analyze, visualize, and interact with musical content.
+Notalyzr is a powerful music analysis tool that combines modern web technologies with advanced music theory concepts. It provides a comprehensive platform for musicians, educators, and enthusiasts to analyze, visualize, and interact with musical content.
 
 ### Key Features
 
