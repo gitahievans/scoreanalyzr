@@ -4,7 +4,7 @@ A modern web application for music analysis, visualization, and education built 
 
 ## Overview
 
-Notalyzr is a powerful music analysis tool that combines modern web technologies with advanced music theory concepts. It provides a comprehensive platform for musicians, educators, and enthusiasts to analyze, visualize, and interact with musical content.
+Scorelearn is a powerful music analysis platform that combines modern web technologies with advanced music theory concepts. It provides a comprehensive platform for musicians, educators, and enthusiasts to analyze, visualize, and interact with musical content.
 
 ### Key Features
 
@@ -52,6 +52,7 @@ Notalyzr is a powerful music analysis tool that combines modern web technologies
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15.2.3
 - **Language**: TypeScript
 - **UI Components**: Mantine, Radix UI
@@ -63,6 +64,7 @@ Notalyzr is a powerful music analysis tool that combines modern web technologies
 - **AI Integration**: OpenAI, Genkit
 
 ### Backend
+
 - **Database**: Firebase
 - **Deployment**: Cloudflare Pages
 - **Authentication**: Firebase Auth
@@ -71,6 +73,7 @@ Notalyzr is a powerful music analysis tool that combines modern web technologies
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js (latest LTS version)
 - npm or yarn
 - Firebase CLI (for backend development)
@@ -80,11 +83,13 @@ Notalyzr is a powerful music analysis tool that combines modern web technologies
 
 1. Clone the repository
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create a `.env.local` file with required environment variables:
+
 ```
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
@@ -95,6 +100,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 ### Development
 
 1. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -102,11 +108,13 @@ npm run dev
 2. The application will be available at `http://localhost:9002`
 
 3. For AI development:
+
 ```bash
 npm run genkit:dev
 ```
 
 4. For AI development with watch mode:
+
 ```bash
 npm run genkit:watch
 ```
@@ -114,16 +122,19 @@ npm run genkit:watch
 ### Build and Deploy
 
 Build the application:
+
 ```bash
 npm run build
 ```
 
 Preview the build:
+
 ```bash
 npm run preview
 ```
 
 Deploy to Cloudflare:
+
 ```bash
 npm run deploy
 ```

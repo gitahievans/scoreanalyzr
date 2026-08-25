@@ -78,15 +78,47 @@ export default function AnalysisDisplay({
   }, []);
 
   useEffect(() => {
-    if (data?.score?.processed || data?.task_status?.state === "FAILURE") {
+    const taskState = data?.task_status?.state;
+    const isTaskRunning =
+      !!taskState && taskState !== "SUCCESS" && taskState !== "FAILURE";
+
+    if (data?.score?.processed || taskState === "FAILURE") {
       onProcessingChange(false);
-    } else if (data?.task_status?.state === "PENDING" || isLoading) {
+    } else if (isTaskRunning || isLoading) {
       onProcessingChange(true);
     }
   }, [data, isLoading, onProcessingChange]);
 
+  const taskInfo =
+    data?.task_status?.info && typeof data.task_status.info !== "string"
+      ? data.task_status.info
+      : null;
+  const taskMessage =
+    taskInfo?.message ||
+    (typeof data?.task_status?.info === "string" ? data.task_status.info : null);
+  const isTaskProcessing =
+    !!data?.task_status?.state &&
+    data.task_status.state !== "SUCCESS" &&
+    data.task_status.state !== "FAILURE" &&
+    !data?.score?.processed;
+  const taskFailed = data?.task_status?.state === "FAILURE";
+  const sourceLabel =
+    data?.score?.source_type === "audio" ? "audio" : "music score";
+  const isAudioSource = data?.score?.source_type === "audio";
+  const playbackMidiUrl =
+    data?.score?.playback_midi_url || data?.score?.midi_url || null;
+  const sourceAudioUrl =
+    data?.score?.source_audio_url && API_URL
+      ? `${API_URL}${data.score.source_audio_url}`
+      : null;
+  const loaderMessage =
+    taskMessage ||
+    (isAudioSource
+      ? "Transcribing your audio and analyzing the generated score..."
+      : "Analyzing your music score with Audiveris...");
+
   useEffect(() => {
-    if (data?.score?.processed && data?.task_status?.state !== "PENDING") {
+    if (data?.score?.processed && !isTaskProcessing) {
       const fetchMusicXml = async () => {
         try {
           console.log(
@@ -160,7 +192,7 @@ export default function AnalysisDisplay({
       };
 
       const fetchMidiData = async () => {
-        if (!data?.score?.midi_url) {
+        if (!playbackMidiUrl) {
           console.log("No MIDI URL available");
           return;
         }
@@ -169,7 +201,7 @@ export default function AnalysisDisplay({
         setMidiError(null);
 
         try {
-          const response = await fetch(`${API_URL}${data.score.midi_url}`, {
+          const response = await fetch(`${API_URL}${playbackMidiUrl}`, {
             method: "GET",
             headers: {
               Accept: "audio/midi, audio/x-midi, */*",
@@ -195,9 +227,11 @@ export default function AnalysisDisplay({
       };
 
       fetchMusicXml();
-      fetchMidiData();
+      if (playbackMidiUrl) {
+        fetchMidiData();
+      }
     }
-  }, [data?.score?.processed, data?.task_status?.state, fetchAttempts]);
+  }, [data?.score?.processed, isTaskProcessing, fetchAttempts, playbackMidiUrl]);
 
   // OSMD event handlers
   const handleMusicLoad = () => {
@@ -389,6 +423,56 @@ export default function AnalysisDisplay({
     );
   }
 
+  if (taskFailed && data?.score && !data.score.processed) {
+    const failureMessage =
+      taskMessage ||
+      data.score.results?.error ||
+      `The uploaded ${sourceLabel} could not be processed.`;
+
+    return (
+      <div className="space-y-6 p-4">
+        <h2 className="text-2xl font-bold text-orange-600 flex items-center gap-2">
+          <Music className="h-6 w-6" /> Score Analysis Results
+        </h2>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Processing Failed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 font-medium">{failureMessage}</p>
+                {taskInfo?.stage && (
+                  <p className="text-red-600 text-sm mt-2">
+                    Stage: {taskInfo.stage}
+                  </p>
+                )}
+              </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800 text-sm">
+                  {data.score.source_type === "audio"
+                    ? "Audio transcription works best with clean solo recordings and may struggle with noisy or dense mixes."
+                    : "Try a cleaner or simpler score file if the current upload could not be processed."}
+                </p>
+              </div>
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <RefreshCcw className="h-4 w-4" />
+                Check Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 md:p-6 rounded-xl">
       <h2 className="text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2 px-2 sm:px-0">
@@ -397,12 +481,9 @@ export default function AnalysisDisplay({
         <span className="sm:hidden">Analysis Results</span>
       </h2>
 
-      {isLoading ||
-      (data &&
-        !data.score?.processed &&
-        data.task_status?.state === "PENDING") ? (
+      {isLoading || isTaskProcessing ? (
         <MusicTheoryLoader
-          message="Analyzing your music score with Audiveris..."
+          message={loaderMessage}
           className="my-custom-classes"
         />
       ) : (
@@ -422,22 +503,26 @@ export default function AnalysisDisplay({
               className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
             >
               <span className="sm:hidden text-center leading-tight">
-                Sheet
+                {isAudioSource ? "Draft" : "Sheet"}
                 <br />
-                Music
+                {isAudioSource ? "Score" : "Music"}
               </span>
-              <span className="hidden sm:inline">Sheet Music</span>
+              <span className="hidden sm:inline">
+                {isAudioSource ? "Transcribed Score" : "Sheet Music"}
+              </span>
             </TabsTrigger>
             <TabsTrigger
               value="midi"
               className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 py-3 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all min-h-[60px] sm:min-h-[40px]"
             >
               <span className="sm:hidden text-center leading-tight">
-                MIDI
+                {isAudioSource ? "Score" : "MIDI"}
                 <br />
-                Player
+                {isAudioSource ? "Audio" : "Player"}
               </span>
-              <span className="hidden sm:inline">MIDI Player</span>
+              <span className="hidden sm:inline">
+                {isAudioSource ? "Score Playback" : "MIDI Player"}
+              </span>
             </TabsTrigger>
             <TabsTrigger
               value="summary"
@@ -486,7 +571,9 @@ export default function AnalysisDisplay({
                 <div className="flex flex-col gap-4">
                   <CardTitle className="flex items-center gap-2 px-2 sm:px-0">
                     <FileMusic className="h-5 w-5" />
-                    Sheet Music Viewer
+                    {isAudioSource
+                      ? "Transcribed Score Draft"
+                      : "Sheet Music Viewer"}
                   </CardTitle>
                   <div className="flex flex-col sm:flex-row gap-2 px-2 sm:px-0">
                     {musicXmlContent && (
@@ -511,6 +598,24 @@ export default function AnalysisDisplay({
               <CardContent className="px-2 sm:px-6">
                 {musicXmlContent ? (
                   <div className="space-y-4">
+                    {isAudioSource && (
+                      <Alert>
+                        <AlertDescription className="text-sm text-amber-800">
+                          This is an AI-generated draft transcription optimized
+                          for analysis. It may not be polished engraved sheet
+                          music.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {!isAudioSource &&
+                      data?.score?.results?.score_cleanup?.applied && (
+                        <Alert>
+                          <AlertDescription className="text-sm text-blue-800">
+                            Score notation was cleaned after recognition to
+                            improve readability and playback.
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     {musicXmlError && (
                       <Alert className="mb-4">
                         <AlertDescription>
@@ -599,11 +704,29 @@ export default function AnalysisDisplay({
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 px-2 sm:px-0">
                   <Music className="h-5 w-5" />
-                  MIDI Player
+                  {isAudioSource ? "Audio and Score Playback" : "MIDI Player"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-2 sm:px-6">
                 <div className="space-y-4">
+                  {isAudioSource && sourceAudioUrl && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-gray-900">
+                        Original Audio
+                      </div>
+                      <audio
+                        controls
+                        src={sourceAudioUrl}
+                        className="w-full"
+                        preload="metadata"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Compare the uploaded recording with the generated score
+                        playback below.
+                      </p>
+                    </div>
+                  )}
+
                   {isLoadingMidi && (
                     <Alert>
                       <AlertDescription className="flex items-center gap-2">
@@ -638,7 +761,7 @@ export default function AnalysisDisplay({
                       className="flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 h-10 w-full sm:w-auto"
                     >
                       <Download className="h-4 w-4" />
-                      Download MIDI
+                      {isAudioSource ? "Download Playback MIDI" : "Download MIDI"}
                     </Button>
                   )}
 
@@ -646,7 +769,11 @@ export default function AnalysisDisplay({
                     <Alert>
                       <AlertDescription className="text-green-700 text-sm">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1">
-                          <span>MIDI playback ready</span>
+                          <span>
+                            {isAudioSource
+                              ? "Generated score playback ready"
+                              : "MIDI playback ready"}
+                          </span>
                           <span className="hidden sm:inline">•</span>
                           <span>Duration: {formatTime(duration)}</span>
                           <span className="hidden sm:inline">•</span>

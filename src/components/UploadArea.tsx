@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import {
@@ -8,6 +8,7 @@ import {
   IconUpload,
   IconX,
   IconPhoto,
+  IconMusic,
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const uploadScore = async (formData: FormData): Promise<UploadResponse> => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to upload file");
+    throw new Error(errorData.error || errorData.message || "Failed to upload file");
   }
   return response.json();
 };
@@ -61,10 +62,17 @@ const SUPPORTED_FILE_TYPES = {
   "image/jpeg": "JPEG",
   "image/jpg": "JPG",
   "image/png": "PNG",
-  "image/gif": "GIF",
-  "image/bmp": "BMP",
   "image/tiff": "TIFF",
   "image/webp": "WebP",
+  "audio/mpeg": "MP3",
+  "audio/mp3": "MP3",
+  "audio/wav": "WAV",
+  "audio/x-wav": "WAV",
+  "audio/wave": "WAV",
+  "audio/vnd.wave": "WAV",
+  "audio/mp4": "M4A",
+  "audio/x-m4a": "M4A",
+  "video/mp4": "M4A",
 };
 
 const SUPPORTED_EXTENSIONS = [
@@ -72,10 +80,11 @@ const SUPPORTED_EXTENSIONS = [
   ".jpg",
   ".jpeg",
   ".png",
-  ".gif",
-  ".bmp",
   ".tiff",
   ".webp",
+  ".mp3",
+  ".wav",
+  ".m4a",
 ];
 
 export default function UploadArea({
@@ -84,8 +93,9 @@ export default function UploadArea({
 }: UploadAreaProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   // Cleanup blob URLs when component unmounts or files change
   useEffect(() => {
@@ -131,18 +141,28 @@ export default function UploadArea({
   });
 
   const isFileTypeSupported = (file: File): boolean => {
-    return Object.keys(SUPPORTED_FILE_TYPES).includes(file.type);
+    const extension = `.${file.name.split(".").pop()?.toLowerCase() || ""}`;
+    return (
+      Object.keys(SUPPORTED_FILE_TYPES).includes(file.type) ||
+      SUPPORTED_EXTENSIONS.includes(extension)
+    );
   };
 
   const getFileTypeDisplayName = (file: File): string => {
+    const extension = file.name.split(".").pop()?.toUpperCase();
     return (
       SUPPORTED_FILE_TYPES[file.type as keyof typeof SUPPORTED_FILE_TYPES] ||
+      extension ||
       "Unknown"
     );
   };
 
   const isImageFile = (file: File): boolean => {
     return file.type.startsWith("image/");
+  };
+
+  const isAudioFile = (file: File): boolean => {
+    return file.type.startsWith("audio/") || file.name.toLowerCase().endsWith(".m4a");
   };
 
   const createFileWithPreview = (file: File): FileWithPreview => {
@@ -162,7 +182,7 @@ export default function UploadArea({
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
-      setError("File size exceeds 5MB limit");
+      setError("File size exceeds 10MB limit");
       return false;
     }
     return true;
@@ -194,6 +214,8 @@ export default function UploadArea({
   const getFileIcon = (file: File) => {
     return isImageFile(file) ? (
       <IconPhoto size={24} className="text-orange-500" />
+    ) : isAudioFile(file) ? (
+      <IconMusic size={24} className="text-orange-500" />
     ) : (
       <IconFileText size={24} className="text-orange-500" />
     );
@@ -203,6 +225,8 @@ export default function UploadArea({
     if (files.length > 0) {
       return isImageFile(files[0].file) ? (
         <IconPhoto size={52} className="text-orange-500" />
+      ) : isAudioFile(files[0].file) ? (
+        <IconMusic size={52} className="text-orange-500" />
       ) : (
         <IconFileText size={52} className="text-orange-500" />
       );
@@ -230,8 +254,20 @@ export default function UploadArea({
         }}
       >
         <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Upload Music Score (PDF or Image)
+          Upload Music Score or Audio
         </Label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={SUPPORTED_EXTENSIONS.join(",")}
+          className="sr-only"
+          onChange={(event) => {
+            if (event.target.files) {
+              handleDrop(Array.from(event.target.files));
+            }
+            event.target.value = "";
+          }}
+        />
         <div
           className={`border-2 border-dashed rounded-lg p-6 cursor-pointer
             ${
@@ -253,14 +289,7 @@ export default function UploadArea({
           onDragOver={(e) => e.preventDefault()}
           onClick={() => {
             if (isProcessing) return;
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = SUPPORTED_EXTENSIONS.join(",");
-            input.onchange = (e) => {
-              const target = e.target as HTMLInputElement;
-              if (target.files) handleDrop(Array.from(target.files));
-            };
-            input.click();
+            fileInputRef.current?.click();
           }}
         >
           <div className="flex flex-col items-center space-y-4">
@@ -269,12 +298,18 @@ export default function UploadArea({
               <p className="text-xl">
                 {files.length
                   ? `${files.length} file selected`
-                  : "Drag a PDF or image file here or click to select"}
+                  : "Drag a score or audio file here or click to select"}
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                Supported formats: PDF, JPEG, PNG, TIFF
+                Supported formats: PDF, JPEG, PNG, TIFF, WebP, MP3, WAV, M4A
               </p>
-              <p className="text-sm text-gray-500">Maximum file size: 5MB</p>
+              <p className="text-sm text-gray-500">Maximum file size: 10MB</p>
+              <p className="text-sm text-gray-500">
+                Audio transcription is best-effort. Clean solo recordings work best.
+              </p>
+              <p className="text-sm text-gray-500">
+                Generated notation is a draft transcription optimized for analysis.
+              </p>
               {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
             </div>
           </div>
@@ -340,7 +375,7 @@ export default function UploadArea({
               Uploading...
             </>
           ) : (
-            "Upload Score"
+            "Upload and Analyze"
           )}
         </Button>
       </form>

@@ -56,6 +56,9 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
   taskId,
   children,
 }) => {
+  const isTerminalTaskState = (state?: string | null) =>
+    state === "SUCCESS" || state === "FAILURE";
+
   const { data, error, isLoading, refetch } = useQuery<ScoreResponse, Error>({
     queryKey: ["score", scoreId, taskId],
     queryFn: () => fetchScore(scoreId!, taskId!),
@@ -76,10 +79,11 @@ export const ScoreDataProvider: React.FC<ScoreDataProviderProps> = ({
         return false;
       }
 
-      // Continue polling only if the task is still pending and not processed
-      return data &&
-        data?.task_status?.state === "PENDING" &&
-        !data?.score?.processed
+      if (!data?.task_status) {
+        return false;
+      }
+
+      return !data.score?.processed && !isTerminalTaskState(data.task_status.state)
         ? 3000
         : false;
     },

@@ -72,7 +72,7 @@ export function Layout({ children }: { children: ReactNode }) {
               href="/"
               className="text-xl font-bold text-orange-600 no-underline"
             >
-              ScoreAnalyzr
+              Scorelearn
             </Link>
           </Group>
 

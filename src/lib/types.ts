@@ -98,6 +98,37 @@ export interface ScoreResults {
   time_signature: string;
   score_structure: ScoreStructure;
   notable_elements: NotableElements;
+  text_content?: {
+    status?: string;
+    message?: string;
+    cleaned_text?: string;
+    other_text?: string[];
+  };
+  error?: string;
+  stage?: string;
+  error_type?: string;
+  audio_transcription?: {
+    transcription_quality?: string;
+    detected_instrument_hint?: string;
+    used_piano_split?: boolean;
+    cleanup_summary?: {
+      raw_note_events?: number;
+      cleaned_note_events?: number;
+      piano_split_threshold?: number;
+    };
+  };
+  score_cleanup?: {
+    applied?: boolean;
+    source?: string;
+    transcription_quality?: string;
+    detected_instrument_hint?: string;
+    used_piano_split?: boolean;
+    cleanup_summary?: {
+      raw_note_events?: number;
+      cleaned_note_events?: number;
+      piano_split_threshold?: number;
+    };
+  };
 }
 
 export interface Score {
@@ -112,11 +143,22 @@ export interface Score {
   processed: boolean;
   musicxml_url: string | null;
   midi_url: string | null;
+  source_type: "pdf" | "image" | "audio";
+  source_audio_url?: string | null;
+  playback_midi_url?: string | null;
+}
+
+export interface TaskInfo {
+  stage?: string;
+  message?: string;
+  progress_percent?: number;
+  error?: string;
+  error_type?: string;
 }
 
 export interface TaskStatus {
   state: string;
-  info: string | null;
+  info: TaskInfo | string | null;
 }
 
 export interface ScoreResponse {

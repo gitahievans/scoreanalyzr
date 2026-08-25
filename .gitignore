@@ -43,3 +43,6 @@ open-next.config.ts
 .env
 .env.local
 *.env
+
+.open-next
+docs

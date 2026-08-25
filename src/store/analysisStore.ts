@@ -1,5 +1,15 @@
 import { create } from "zustand";
-import { AnalyzeScoreOutput } from "@/ai/flows/analyze-score";
+
+interface AnalyzeScoreOutput {
+  timeSignature: string;
+  keySignature: string;
+  tempoMarkings: string;
+  dynamics: string;
+  musicalInstructions: string;
+  overallStructure: string;
+  harmonicContent: string;
+  notableFeatures: string;
+}
 
 interface AnalysisHistoryItem {
   id: string;
