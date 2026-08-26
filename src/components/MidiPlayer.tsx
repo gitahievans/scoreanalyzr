@@ -83,9 +83,13 @@ export default function MidiPlayer({
     }
 
     if (instrument?.type === "tonejs-piano") {
-      return createSampler("piano").toDestination();
+      const sampler = createSampler("piano").toDestination();
+      await Tone.loaded();
+      return sampler;
     } else if (instrument?.type === "sampler") {
-      return createSampler(instrumentKey).toDestination();
+      const sampler = createSampler(instrumentKey).toDestination();
+      await Tone.loaded();
+      return sampler;
     } else if (instrument?.type === "synth" && instrument.synthType) {
       // Synthesized instrument
       const synthInstance = new instrument.synthType();

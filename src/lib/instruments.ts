@@ -94,7 +94,17 @@ function buildInstrumentUrls(
 ): Record<string, string> {
   const urls: Record<string, string> = {};
   noteRange.forEach((note) => {
-    urls[note] = `${note}.mp3`; // Use full note name with octave (e.g., C4.mp3, F#5.mp3)
+    // Tone.js uses sharp note names, but the FluidR3_GM sample files use
+    // their enharmonic flat names (for example, C#4 maps to Db4.mp3).
+    // A literal `#` would also be interpreted as a URL fragment.
+    const sampleNote = note
+      .replace("C#", "Db")
+      .replace("D#", "Eb")
+      .replace("F#", "Gb")
+      .replace("G#", "Ab")
+      .replace("A#", "Bb");
+
+    urls[note] = `${sampleNote}.mp3`;
   });
   return urls;
 }
