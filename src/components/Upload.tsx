@@ -9,6 +9,7 @@ import { Alert } from "@mantine/core";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { API_URL, getApiErrorMessage } from "@/lib/api";
 
 interface Category {
   id: number;
@@ -49,7 +50,7 @@ const uploadScore = async (formData: FormDataType): Promise<UploadResponse> => {
   payload.append("analyze", "false");
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/upload/`,
+    `${API_URL}/api/upload/`,
     {
       method: "POST",
       body: payload,
@@ -57,8 +58,7 @@ const uploadScore = async (formData: FormDataType): Promise<UploadResponse> => {
   );
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to upload file");
+    throw new Error(await getApiErrorMessage(response, "Failed to upload file"));
   }
   return response.json();
 };
@@ -82,7 +82,7 @@ export default function PDFUploader() {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/categories/`
+          `${API_URL}/api/categories/`
         );
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();

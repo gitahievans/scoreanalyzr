@@ -5,6 +5,7 @@ import { IconDownload, IconCalendar, IconUser } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import PDFDetailModal from "./PDFDetailModal";
 import { FileType } from "./Home";
+import { API_URL } from "@/lib/api";
 
 const PDFCard = ({ pdf }: { pdf: FileType }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -32,7 +33,7 @@ const PDFCard = ({ pdf }: { pdf: FileType }) => {
 
     try {
       const response: Response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/download/${pdf.id}/download`
+        `${API_URL}/api/download/${pdf.id}/download`
       );
       const blob: PDFBlob = (await response.blob()) as PDFBlob;
       const url: string = window.URL.createObjectURL(blob);

@@ -5,6 +5,7 @@ import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { notifications } from "@mantine/notifications";
 import { Category, FileType } from "./Home";
+import { API_URL } from "@/lib/api";
 
 interface UpdateFormProps {
   pdf: FileType;
@@ -59,7 +60,7 @@ const UpdateForm = ({ pdf, isEditing, setIsEditing }: UpdateFormProps) => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/categories/`
+          `${API_URL}/api/categories/`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
@@ -83,7 +84,7 @@ const UpdateForm = ({ pdf, isEditing, setIsEditing }: UpdateFormProps) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/update/${pdf.id}/`,
+        `${API_URL}/api/update/${pdf.id}/`,
         {
           method: "PUT",
           headers: {

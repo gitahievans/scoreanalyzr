@@ -7,6 +7,7 @@ import { IconSearch } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { useSnapshot } from "valtio";
 import { globalState } from "../state/state";
+import { API_URL } from "@/lib/api";
 
 export interface Category {
   id: number;
@@ -34,9 +35,7 @@ const Home = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/files/`
-        );
+        const response = await fetch(`${API_URL}/api/files/`);
         if (!response.ok) {
           throw new Error("Failed to fetch files");
         }

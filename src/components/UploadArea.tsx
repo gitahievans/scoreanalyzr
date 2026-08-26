@@ -12,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { Button } from "@/components/ui/button";
+import { API_URL, getApiErrorMessage } from "@/lib/api";
 
 interface UploadResponse {
   status: string;
@@ -43,15 +44,13 @@ const uploadScore = async (formData: FormData): Promise<UploadResponse> => {
     payload.append("analyze", "true");
   }
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await fetch(`${API_URL}/api/upload/`, {
     method: "POST",
     body: payload,
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || errorData.message || "Failed to upload file");
+    throw new Error(await getApiErrorMessage(response, "Failed to upload file"));
   }
   return response.json();
 };

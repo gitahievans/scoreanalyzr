@@ -23,7 +23,7 @@ import { Divider } from "@mantine/core";
 import AnalysisResults from "./AnalysisResults";
 import MidiPlayer from "./MidiPlayer";
 import MusicTheoryLoader from "./MusicTheoryContent ";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from "@/lib/api";
 
 interface AnalysisDisplayProps {
   onProcessingChange: (isProcessing: boolean) => void;

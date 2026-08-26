@@ -12,13 +12,11 @@ import {
   NotableElements,
   Chord,
 } from "@/lib/types";
+import { API_URL } from "@/lib/api";
 
 export const ScoreDataContext = createContext<
   ScoreDataContextState | undefined
 >(undefined);
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-console.log("API_URL_FROM_CONTEXT:", API_URL);
 
 export const fetchScore = async (
   id: number,
